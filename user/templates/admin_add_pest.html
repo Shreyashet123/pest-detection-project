@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Pest - Admin Panel</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- SweetAlert2 for confirmation dialogs -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- Custom CSS -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: 250px;
+            background: linear-gradient(180deg, #2c3e50 0%, #1a252f 100%);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            padding-top: 20px;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+        }
+        
+        .sidebar-brand {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            padding: 0 20px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-nav a:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: #3498db;
+        }
+        
+        .sidebar-nav a.active {
+            background-color: rgba(52, 152, 219, 0.2);
+            color: white;
+            border-left-color: #3498db;
+        }
+        
+        .sidebar-nav i {
+            width: 25px;
+            font-size: 1.2rem;
+            margin-right: 10px;
+        }
+        
+        .card {
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border: none;
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid #eee;
+            padding: 20px;
+            font-weight: 600;
+            font-size: 1.2rem;
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            border: none;
+            padding: 10px 30px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        
+        .preview-image {
+            max-width: 300px;
+            max-height: 300px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px dashed #ddd;
+            padding: 5px;
+            background-color: #f9f9f9;
+        }
+        
+        .form-section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .form-section h5 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .form-section h5 i {
+            margin-right: 10px;
+            color: #3498db;
+        }
+        
+        .info-text {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .severity-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .severity-low {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .severity-medium {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .severity-high {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .severity-very-high {
+            background-color: #721c24;
+            color: white;
+        }
+        
+        .image-upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .image-upload-area:hover {
+            background-color: #e3f2fd;
+            border-color: #2980b9;
+        }
+        
+        .image-upload-area i {
+            font-size: 3rem;
+            color: #3498db;
+            margin-bottom: 15px;
+        }
+        
+        .upload-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .upload-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .file-info {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            height: 5px;
+            background-color: #3498db;
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 3px;
+            margin-top: 10px;
+        }
+        
+        /* Pest List Styling */
+        .pest-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            background-color: white;
+        }
+        
+        .pest-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .pest-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .pest-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        
+        .pest-scientific {
+            font-style: italic;
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .pest-description {
+            color: #555;
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .pest-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #eee;
+        }
+        
+        .pest-date {
+            font-size: 0.8rem;
+            color: #95a5a6;
+        }
+        
+        .pest-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .btn-action {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-edit {
+            background-color: #3498db;
+            color: white;
+            border: none;
+        }
+        
+        .btn-delete {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+        }
+        
+        .btn-view {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+        }
+        
+        .btn-edit:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-view:hover {
+            background-color: #27ae60;
+        }
+        
+        .new-badge {
+            background-color: #2ecc71;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #bdc3c7;
+        }
+        
+        /* Image fix for pest cards */
+        .pest-image-thumbnail {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .pest-image-default {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(135deg, #3498db, #2ecc71);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        
+        .pest-image-default i {
+            font-size: 3rem;
+            color: white;
+            opacity: 0.7;
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-brand">
+            <i class="fas fa-bug"></i> Pest Admin
+        </div>
+        
+        <ul class="sidebar-nav">
+            <li>
+                <a href="{{ url_for('admin_dashboard') }}">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_queries') }}">
+                    <i class="fas fa-question-circle"></i> User Queries
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_add_pest') }}">
+                    <i class="fas fa-book"></i> Pest Library
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_add_pest') }}" class="active">
+                    <i class="fas fa-plus-circle"></i> Add New Pest
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_pest_management') }}">
+                    <i class="fas fa-bug"></i> Pest Management
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_user_management') }}">
+                    <i class="fas fa-users"></i> User Management
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('admin_analytics_page') }}">
+                    <i class="fas fa-chart-line"></i> Analytics
+                </a>
+            </li>
+            <li>
+                <a href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Page Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="mb-1" style="color: #2c3e50;">
+                    <i class="fas fa-plus-circle text-primary"></i> Add New Pest
+                </h2>
+                <p class="text-muted">Add new pest information to the pest library. Images will be uploaded to Cloudinary.</p>
+            </div>
+            <div>
+                <a href="{{ url_for('admin_pest_management') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Back to Pest Management
+                </a>
+            </div>
+        </div>
+        
+        <!-- Flash Messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'danger' else 'success' if category == 'success' else 'warning' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        
+        <!-- Add Pest Form -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-bug me-2"></i>Add New Pest Information
+                <span class="badge bg-info float-end">Images uploaded to Cloudinary</span>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin_add_pest') }}" enctype="multipart/form-data" id="addPestForm">
+                    
+                    <!-- Basic Information Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-info-circle"></i> Basic Information</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required-field">Pest Name</label>
+                                <input type="text" class="form-control" name="name" required 
+                                       placeholder="e.g., Aphid, Whitefly, Caterpillar" id="pestName">
+                                <div class="info-text">Common name of the pest</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Scientific Name</label>
+                                <input type="text" class="form-control" name="scientific_name" 
+                                       placeholder="e.g., Aphis gossypii" id="scientificName">
+                                <div class="info-text">Scientific/Latin name of the pest</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Bengali Name</label>
+                                <input type="text" class="form-control" name="bengali_name" 
+                                       placeholder="e.g., আফিড, মাকড়" id="bengaliName">
+                                <div class="info-text">Bengali name of the pest (optional)</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label required-field">Severity Level</label>
+                                <select class="form-select" name="severity" required id="severity">
+                                    <option value="low">Low Severity</option>
+                                    <option value="medium" selected>Medium Severity</option>
+                                    <option value="high">High Severity</option>
+                                    <option value="very_high">Very High Severity</option>
+                                </select>
+                                <div class="info-text">How damaging is this pest to crops?</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label required-field">Description</label>
+                            <textarea class="form-control" name="description" rows="3" required 
+                                      placeholder="Describe the pest's appearance, behavior, and habitat..." id="description"></textarea>
+                            <div class="info-text">Detailed description of the pest</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Image Upload Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-image"></i> Pest Image</h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Upload Image</label>
+                                
+                                <!-- Image Upload Area -->
+                                <div class="image-upload-area" onclick="document.getElementById('image_file').click()">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <h5>Upload Pest Image</h5>
+                                    <p class="text-muted">Click to select an image</p>
+                                    <p class="file-info">Supports: PNG, JPG, JPEG, GIF, WEBP</p>
+                                    <p class="file-info">Max size: 5MB</p>
+                                </div>
+                                
+                                <!-- Hidden file input -->
+                                <input type="file" class="form-control d-none" name="image_file" id="image_file" accept="image/*" onchange="previewImage(this)">
+                                
+                                <!-- Image Preview -->
+                                <div id="imagePreviewContainer" class="mt-3 text-center" style="display: none;">
+                                    <h6>Image Preview</h6>
+                                    <img id="previewImage" class="preview-image" src="" alt="Image Preview">
+                                    <div class="mt-2">
+                                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeImage()">
+                                            <i class="fas fa-trash"></i> Remove Image
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="info-text mt-2">Image will be uploaded to Cloudinary</div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Or Enter Image URL</label>
+                                <input type="url" class="form-control" name="image" 
+                                       placeholder="https://example.com/pest-image.jpg" id="imageUrl">
+                                <div class="info-text">Enter direct image URL (optional)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Harmful Effects Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-skull-crossbones"></i> Harmful Effects</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Harmful Effects (One per line)</label>
+                            <textarea class="form-control" name="harmful_effects" rows="4" 
+                                      placeholder="Enter each harmful effect on a new line:
+• Stunts plant growth
+• Transmits plant diseases
+• Reduces crop yield
+• Causes leaf curling" id="harmfulEffects"></textarea>
+                            <div class="info-text">List the negative impacts this pest has on plants. One item per line.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Organic Solutions Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-leaf"></i> Organic Solutions</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Organic Control Methods (One per line)</label>
+                            <textarea class="form-control" name="organic_solutions" rows="4" 
+                                      placeholder="Enter each organic solution on a new line:
+• Use neem oil spray
+• Introduce ladybugs
+• Plant marigolds as companion plants
+• Apply garlic-chili spray" id="organicSolutions"></textarea>
+                            <div class="info-text">Natural and organic methods to control the pest. One method per line.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chemical Pesticides Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-flask"></i> Chemical Pesticides</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Chemical Pesticides (One per line)</label>
+                            <textarea class="form-control" name="chemical_pesticides" rows="4" 
+                                      placeholder="Enter each chemical pesticide on a new line:
+• Imidacloprid (use as per instructions)
+• Cypermethrin (follow safety guidelines)
+• Malathion (apply during early morning)" id="chemicalPesticides"></textarea>
+                            <div class="info-text">Chemical solutions with usage instructions. One pesticide per line.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Prevention Methods Section -->
+                    <div class="form-section">
+                        <h5><i class="fas fa-shield-alt"></i> Prevention Methods</h5>
+                        <div class="mb-3">
+                            <label class="form-label">Prevention & Management (One per line)</label>
+                            <textarea class="form-control" name="prevention_methods" rows="4" 
+                                      placeholder="Enter each prevention method on a new line:
+• Regular field monitoring
+• Crop rotation practices
+• Remove infected plants immediately
+• Maintain proper field hygiene" id="preventionMethods"></textarea>
+                            <div class="info-text">Methods to prevent pest infestation. One method per line.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Buttons -->
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ url_for('admin_pest_management') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <i class="fas fa-plus-circle"></i> Add Pest to Library
+                        </button>
+                    </div>
+                    
+                </form>
+            </div>
+        </div>
+        
+        <!-- Existing Pests Section -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-list me-2"></i>Existing Admin-Added Pests ({{ new_pests_count }})
+            </div>
+            <div class="card-body">
+                {% if pests %}
+                    <div class="row">
+                        {% for pest in pests %}
+                        <div class="col-md-4 mb-3">
+                            <div class="pest-card">
+                                <!-- Pest Image -->
+                                {% if pest.image_url %}
+                                    <img src="{{ pest.image_url }}" alt="{{ pest.name }}" class="pest-image-thumbnail">
+                                {% elif pest.image %}
+                                    <img src="{{ pest.image }}" alt="{{ pest.name }}" class="pest-image-thumbnail">
+                                {% else %}
+                                    <div class="pest-image-default">
+                                        <i class="fas fa-bug"></i>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="pest-card-header">
+                                    <div>
+                                        <div class="pest-name">
+                                            {{ pest.name }}
+                                            {% if pest.is_new %}
+                                            <span class="new-badge">NEW</span>
+                                            {% endif %}
+                                        </div>
+                                        {% if pest.scientific_name %}
+                                        <div class="pest-scientific">
+                                            <i>{{ pest.scientific_name }}</i>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <span class="severity-badge severity-{{ pest.severity|default('medium') }}">
+                                            {{ pest.severity|default('medium')|title }}
+                                        </span>
+                                    </div>
+                                </div>
+                                
+                                {% if pest.description %}
+                                <div class="pest-description">
+                                    {{ pest.description[:100] }}{% if pest.description|length > 100 %}...{% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="pest-footer">
+                                    <div class="pest-date">
+                                        <i class="far fa-calendar"></i> {{ pest.formatted_date }}
+                                    </div>
+                                    <div class="pest-actions">
+                                        <button class="btn btn-action btn-view" onclick="viewPest('{{ pest._id }}')" 
+                                                title="View Details">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <a href="{{ url_for('admin_edit_pest', pest_id=pest._id) }}" 
+                                           class="btn btn-action btn-edit" title="Edit Pest">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button class="btn btn-action btn-delete" 
+                                                onclick="deletePest('{{ pest._id }}', '{{ pest.name }}')"
+                                                title="Delete Pest">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="fas fa-bug"></i>
+                        <h4>No Pests Added Yet</h4>
+                        <p>Start by adding your first pest using the form above.</p>
+                        <button type="button" class="btn btn-primary" onclick="loadSampleData()">
+                            <i class="fas fa-vial"></i> Load Sample Data
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Information Card -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-lightbulb me-2"></i>Important Information
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-cloud-upload-alt fa-2x text-primary mb-2"></i>
+                            <h6>Cloudinary Integration</h6>
+                            <p class="text-muted small">Images are automatically uploaded to Cloudinary for fast delivery and optimized storage.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-certificate fa-2x text-success mb-2"></i>
+                            <h6>NEW Badge Feature</h6>
+                            <p class="text-muted small">Newly added pests will show a <span class="badge bg-success">NEW</span> badge for 5 days.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center mb-3">
+                            <i class="fas fa-sync-alt fa-2x text-info mb-2"></i>
+                            <h6>Instant Updates</h6>
+                            <p class="text-muted small">Changes appear immediately in both admin and user interfaces.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-check-circle text-success me-2"></i>What happens after adding?</h6>
+                        <ul class="text-muted small">
+                            <li>Pest appears in Pest Library immediately</li>
+                            <li>Shows <span class="badge bg-success">NEW</span> badge for 5 days</li>
+                            <li>Users can view pest details immediately</li>
+                            <li>Image is optimized and served from Cloudinary CDN</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6><i class="fas fa-exclamation-triangle text-warning me-2"></i>Important Notes</h6>
+                        <ul class="text-muted small">
+                            <li>Pest names must be unique</li>
+                            <li>Image upload is optional but recommended</li>
+                            <li>All fields can be edited later</li>
+                            <li>NEW badge is removed if pest is edited</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elements
+            const imageInput = document.getElementById('image_file');
+            const previewContainer = document.getElementById('imagePreviewContainer');
+            const previewImage = document.getElementById('previewImage');
+            const form = document.getElementById('addPestForm');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Drag and drop functionality
+            const uploadArea = document.querySelector('.image-upload-area');
+            
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            // Highlight drop area when item is dragged over it
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+            
+            // Handle dropped files
+            uploadArea.addEventListener('drop', handleDrop, false);
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function highlight() {
+                uploadArea.style.backgroundColor = '#e3f2fd';
+                uploadArea.style.borderColor = '#2980b9';
+            }
+            
+            function unhighlight() {
+                uploadArea.style.backgroundColor = '#f8f9fa';
+                uploadArea.style.borderColor = '#3498db';
+            }
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files.length > 0) {
+                    imageInput.files = files;
+                    previewImageHandler(files[0]);
+                }
+            }
+            
+            // Image preview functionality
+            function previewImageHandler(file) {
+                if (file) {
+                    // Check file size (max 5MB)
+                    if (file.size > 5 * 1024 * 1024) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'File too large',
+                            text: 'File size must be less than 5MB'
+                        });
+                        return;
+                    }
+                    
+                    // Check file type
+                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                    if (!allowedTypes.includes(file.type)) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Invalid file type',
+                            text: 'Please upload a valid image file (JPEG, PNG, GIF, WEBP)'
+                        });
+                        return;
+                    }
+                    
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewContainer.style.display = 'block';
+                    }
+                    
+                    reader.readAsDataURL(file);
+                    
+                    // Show file info
+                    const fileInfo = `Selected: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`;
+                    uploadArea.querySelector('.text-muted').textContent = fileInfo;
+                }
+            }
+            
+            // Remove image
+            window.removeImage = function() {
+                imageInput.value = '';
+                previewContainer.style.display = 'none';
+                previewImage.src = '';
+                uploadArea.querySelector('.text-muted').textContent = 'Click to select an image or drag and drop';
+            }
+            
+            // Preview image when file is selected
+            window.previewImage = function(input) {
+                if (input.files && input.files[0]) {
+                    previewImageHandler(input.files[0]);
+                }
+            }
+            
+            // Form validation
+            form.addEventListener('submit', function(e) {
+                const pestName = document.getElementById('pestName');
+                const description = document.getElementById('description');
+                
+                if (!pestName.value.trim()) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Missing Information',
+                        text: 'Please enter a pest name'
+                    });
+                    pestName.focus();
+                    return false;
+                }
+                
+                if (!description.value.trim()) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Missing Information',
+                        text: 'Please enter a description'
+                    });
+                    description.focus();
+                    return false;
+                }
+                
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Adding Pest...';
+                
+                return true;
+            });
+            
+            // Load sample data for testing
+            window.loadSampleData = function() {
+                document.getElementById('pestName').value = 'Aphid';
+                document.getElementById('scientificName').value = 'Aphidoidea';
+                document.getElementById('bengaliName').value = 'আফিড';
+                document.getElementById('description').value = 'Small sap-sucking insects that can cause significant damage to plants. They are usually green, black, or brown and cluster on new growth and undersides of leaves. Aphids reproduce rapidly and can quickly infest a plant.';
+                document.getElementById('harmfulEffects').value = 'Sucks plant sap causing stunted growth\nSecretes honeydew promoting sooty mold\nTransmits plant viruses\nCauses leaf curling and yellowing\nReduces crop yield significantly';
+                document.getElementById('organicSolutions').value = 'Spray with neem oil solution (2-3 times weekly)\nIntroduce ladybugs and lacewings as natural predators\nUse insecticidal soap spray\nPlant garlic or chives as natural repellents\nApply diatomaceous earth around plants';
+                document.getElementById('chemicalPesticides').value = 'Imidacloprid (systemic insecticide, apply as per label)\nPyrethrin-based sprays (contact insecticide)\nAcephate (follow safety instructions)\nMalathion for severe infestations\nSpinosad (organic chemical option)';
+                document.getElementById('preventionMethods').value = 'Regular inspection of plants weekly\nRemove weeds that host aphids\nUse reflective mulches to deter aphids\nEncourage natural predators in garden\nPractice crop rotation annually';
+                document.getElementById('severity').value = 'high';
+                
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Sample Data Loaded',
+                    text: 'Sample data has been loaded. You can now submit the form to test.',
+                    timer: 3000
+                });
+            }
+        });
+        
+        // Delete pest function
+        function deletePest(pestId, pestName) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: `You are about to delete pest "${pestName}". This action cannot be undone!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Send POST request
+                    fetch(`/admin/delete-pest/${pestId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire(
+                                'Deleted!',
+                                data.message,
+                                'success'
+                            ).then(() => {
+                                // Reload page to see updated list
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire(
+                                'Error!',
+                                data.error || 'Failed to delete pest',
+                                'error'
+                            );
+                        }
+                    })
+                    .catch(error => {
+                        Swal.fire(
+                            'Error!',
+                            'Failed to delete pest',
+                            'error'
+                        );
+                    });
+                }
+            });
+        }
+        
+        // View pest function
+        function viewPest(pestId) {
+            window.open(`/pest/${pestId}`, '_blank');
+        }
+    </script>
+</body>
+</html>

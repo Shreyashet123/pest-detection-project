@@ -1,0 +1,800 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<!-- FIX: REMOVED DUPLICATE CONTAINER DIV -->
+<div class="container" style="max-width: 1400px; margin: 40px auto; padding: 30px; background: rgba(255, 255, 255, 0.95); border-radius: 15px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);">
+    
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1 style="color: #2c3e50; font-size: 2.5rem; margin-bottom: 10px;">
+            <i class="fas fa-seedling" style="color: #27ae60;"></i> {{ lang.crop_advisor }}
+        </h1>
+        <p style="color: #7f8c8d; font-size: 1.1rem;">{{ lang.crop_advisor_desc }}</p>
+    </div>
+    
+    <!-- Form Section -->
+    <div class="form-container" style="margin-bottom: 40px;">
+        <div style="background: linear-gradient(135deg, #27ae60, #2ecc71); padding: 20px; border-radius: 10px 10px 0 0;">
+            <h2 style="color: white; margin: 0; font-size: 1.8rem;">
+                <i class="fas fa-clipboard-list"></i> {{ lang.enter_farm_details }}
+            </h2>
+        </div>
+        
+        <form method="POST" action="{{ url_for('crop_recommendation') }}" 
+              style="background: white; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #e0e0e0;">
+            
+            <div class="form-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                
+                <!-- Row 1: Climate -->
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-thermometer-half"></i> {{ lang.temperature_label }}
+                    </label>
+                    <input type="number" name="temperature" step="0.1" required 
+                           value="{{ form_data.temperature if form_data else '' }}"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;"
+                           placeholder="e.g., 25.5" min="-10" max="50">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-cloud"></i> {{ lang.weather_label }}
+                    </label>
+                    <select name="weather" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+                        <option value="">{{ lang.weather_label }}</option>
+                        <option value="{{ lang.sunny }}" {% if form_data and form_data.weather == lang.sunny %}selected{% endif %}>{{ lang.sunny }}</option>
+                        <option value="{{ lang.partly_cloudy }}" {% if form_data and form_data.weather == lang.partly_cloudy %}selected{% endif %}>{{ lang.partly_cloudy }}</option>
+                        <option value="{{ lang.cloudy }}" {% if form_data and form_data.weather == lang.cloudy %}selected{% endif %}>{{ lang.cloudy }}</option>
+                        <option value="{{ lang.rainy }}" {% if form_data and form_data.weather == lang.rainy %}selected{% endif %}>{{ lang.rainy }}</option>
+                        <option value="{{ lang.dry }}" {% if form_data and form_data.weather == lang.dry %}selected{% endif %}>{{ lang.dry }}</option>
+                        <option value="{{ lang.humid }}" {% if form_data and form_data.weather == lang.humid %}selected{% endif %}>{{ lang.humid }}</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-tint"></i> {{ lang.humidity_label }}
+                    </label>
+                    <input type="number" name="humidity" min="0" max="100" required 
+                           value="{{ form_data.humidity if form_data else '' }}"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;"
+                           placeholder="e.g., 65">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-cloud-rain"></i> {{ lang.rainfall_label }}
+                    </label>
+                    <input type="number" name="rainfall" step="0.1" 
+                           value="{{ form_data.rainfall if form_data else '' }}"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;"
+                           placeholder="e.g., 1200">
+                </div>
+                
+                <!-- Row 2: Location & Soil -->
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-map-marker-alt"></i> {{ lang.location_label }}
+                    </label>
+                    <input type="text" name="location" required 
+                           value="{{ form_data.location if form_data else '' }}"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;"
+                           placeholder="e.g., Punjab, India">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-mountain"></i> {{ lang.soil_type_label }}
+                    </label>
+                    <select name="soil_type" required style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+                        <option value="">{{ lang.soil_type_label }}</option>
+                        <option value="{{ lang.clay }}" {% if form_data and form_data.soil_type == lang.clay %}selected{% endif %}>{{ lang.clay }}</option>
+                        <option value="{{ lang.sandy }}" {% if form_data and form_data.soil_type == lang.sandy %}selected{% endif %}>{{ lang.sandy }}</option>
+                        <option value="{{ lang.loamy }}" {% if form_data and form_data.soil_type == lang.loamy %}selected{% endif %}>{{ lang.loamy }}</option>
+                        <option value="{{ lang.silt }}" {% if form_data and form_data.soil_type == lang.silt %}selected{% endif %}>{{ lang.silt }}</option>
+                        <option value="{{ lang.peaty }}" {% if form_data and form_data.soil_type == lang.peaty %}selected{% endif %}>{{ lang.peaty }}</option>
+                        <option value="{{ lang.chalky }}" {% if form_data and form_data.soil_type == lang.chalky %}selected{% endif %}>{{ lang.chalky }}</option>
+                        <option value="{{ lang.rocky }}" {% if form_data and form_data.soil_type == lang.rocky %}selected{% endif %}>{{ lang.rocky }}</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-flask"></i> {{ lang.ph_label }}
+                    </label>
+                    <input type="number" name="ph_level" step="0.1" min="0" max="14" 
+                           value="{{ form_data.ph_level if form_data else '6.5' }}"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;"
+                           placeholder="e.g., 6.5">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-apple-alt"></i> {{ lang.nutrition_label }}
+                    </label>
+                    <select name="nutrition" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+                        <option value="">{{ lang.nutrition_label }}</option>
+                        <option value="{{ lang.low }}" {% if form_data and form_data.nutrition == lang.low %}selected{% endif %}>{{ lang.low }}</option>
+                        <option value="{{ lang.medium }}" {% if form_data and form_data.nutrition == lang.medium %}selected{% endif %}>{{ lang.medium }}</option>
+                        <option value="{{ lang.high }}" {% if form_data and form_data.nutrition == lang.high %}selected{% endif %}>{{ lang.high }}</option>
+                        <option value="{{ lang.very_high }}" {% if form_data and form_data.nutrition == lang.very_high %}selected{% endif %}>{{ lang.very_high }}</option>
+                    </select>
+                </div>
+                
+                <!-- Row 3: Nutrients -->
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-atom"></i> {{ lang.nitrogen_label }}
+                    </label>
+                    <input type="number" name="nitrogen" step="0.1" 
+                           value="{{ form_data.nitrogen if form_data else '' }}"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;"
+                           placeholder="e.g., 120">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-fire"></i> {{ lang.phosphorous_label }}
+                    </label>
+                    <input type="number" name="phosphorous" step="0.1" 
+                           value="{{ form_data.phosphorous if form_data else '' }}"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;"
+                           placeholder="e.g., 60">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #2c3e50;">
+                        <i class="fas fa-bolt"></i> {{ lang.potassium_label }}
+                    </label>
+                    <input type="number" name="potassium" step="0.1" 
+                           value="{{ form_data.potassium if form_data else '' }}"
+                           style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;"
+                           placeholder="e.g., 80">
+                </div>
+                
+            </div>
+            
+            <!-- FIXED: Generate Recommendation Button with Responsive Design -->
+            <div style="text-align: center; margin-top: 30px; width: 100%;">
+                <button type="submit" 
+                        style="background: linear-gradient(135deg, #27ae60, #2ecc71); color: white; border: none; padding: 15px 40px; font-size: 18px; border-radius: 50px; cursor: pointer; transition: all 0.3s; font-weight: 600; display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: 100%; max-width: 400px;">
+                    <i class="fas fa-robot"></i> {{ lang.generate_recommendation }}
+                </button>
+                <p style="color: #7f8c8d; margin-top: 15px; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> {{ lang.required_fields }}
+                </p>
+            </div>
+            
+        </form>
+    </div>
+    
+    {% if recommendation %}
+    <!-- Results Section -->
+    <div class="results-section">
+        
+        <!-- Charts Row 1 -->
+        <div class="charts-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px;">
+            <!-- Crop Suitability Chart -->
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0;">
+                <h3 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #27ae60; padding-bottom: 8px; font-size: 1.2rem;">
+                    <i class="fas fa-chart-bar" style="color: #27ae60;"></i> {{ lang.crop_suitability }}
+                </h3>
+                <div style="height: 250px;">
+                    <canvas id="suitabilityChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Soil Nutrients Chart -->
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0;">
+                <h3 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #3498db; padding-bottom: 8px; font-size: 1.2rem;">
+                    <i class="fas fa-chart-pie" style="color: #3498db;"></i> {{ lang.soil_nutrients }}
+                </h3>
+                <div style="height: 250px;">
+                    <canvas id="nutrientChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row 2 -->
+        <div class="charts-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px;">
+            <!-- Environmental Conditions Line Chart -->
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0;">
+                <h3 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #9b59b6; padding-bottom: 8px; font-size: 1.2rem;">
+                    <i class="fas fa-chart-line" style="color: #9b59b6;"></i> {{ lang.environmental_conditions }}
+                </h3>
+                <div style="height: 250px;">
+                    <canvas id="environmentChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Pest Risk Chart -->
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0;">
+                <h3 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #e74c3c; padding-bottom: 8px; font-size: 1.2rem;">
+                    <i class="fas fa-bug" style="color: #e74c3c;"></i> {{ lang.pest_risk }}
+                </h3>
+                <div style="height: 250px;">
+                    <canvas id="pestChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Charts Row 3 -->
+        <div class="charts-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px;">
+            <!-- Soil Type Chart -->
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0;">
+                <h3 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #f39c12; padding-bottom: 8px; font-size: 1.2rem;">
+                    <i class="fas fa-layer-group" style="color: #f39c12;"></i> {{ lang.soil_type_analysis }}
+                </h3>
+                <div style="height: 250px;">
+                    <canvas id="soilChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Crop Details Card -->
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0;">
+                <h3 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #1abc9c; padding-bottom: 8px; font-size: 1.2rem;">
+                    <i class="fas fa-seedling" style="color: #1abc9c;"></i> {{ lang.recommended_crops }}
+                </h3>
+                <div style="max-height: 210px; overflow-y: auto;">
+                    {% if recommendation.recommended_crops %}
+                        {% for crop in recommendation.recommended_crops %}
+                        <div style="padding: 10px; margin-bottom: 8px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #27ae60;">
+                            <strong style="color: #2c3e50; font-size: 0.95rem;">{{ crop }}</strong>
+                            <span style="float: right; background: #27ae60; color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">
+                                {{ loop.index }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div style="color: #7f8c8d; text-align: center; padding: 15px;">
+                            <i class="fas fa-info-circle" style="font-size: 1.5rem; margin-bottom: 10px;"></i>
+                            <p style="font-size: 0.9rem;">{{ lang.no_crop_data }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Crop Analysis & Recommendations Section -->
+        <div class="charts-row" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px;">
+            <!-- Expert Analysis & Suggestions (Replacing AI Recommendation) -->
+            <div style="background: white; padding: 20px; border-radius: 12px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); border: 1px solid #e0e0e0; grid-column: 1 / -1;">
+                <h3 style="color: #2c3e50; margin-bottom: 15px; border-bottom: 2px solid #f39c12; padding-bottom: 8px; font-size: 1.2rem;">
+                    <i class="fas fa-chalkboard-teacher" style="color: #f39c12;"></i> Expert Analysis & Recommendations
+                </h3>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; max-height: 300px; overflow-y: auto; line-height: 1.6;">
+                    <div style="white-space: pre-line; color: #2c3e50; font-size: 0.95rem;">
+                        {% if recommendation.major_suggestion %}
+                            {{ recommendation.major_suggestion }}
+                        {% elif recommendation.ai_recommendation %}
+                            {{ recommendation.ai_recommendation }}
+                        {% else %}
+                            {{ recommendation.full_report }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Stats -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+            <div style="background: linear-gradient(135deg, #27ae60, #2ecc71); padding: 15px; border-radius: 10px; color: white; text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold;">{{ recommendation.suitability_score if recommendation.suitability_score else '85' }}%</div>
+                <div style="font-size: 0.8rem; opacity: 0.9;">{{ lang.suitability_score }}</div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #3498db, #5dade2); padding: 15px; border-radius: 10px; color: white; text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold;">
+                    {% if recommendation.crops_list %}{{ recommendation.crops_list|length }}{% else %}5{% endif %}
+                </div>
+                <div style="font-size: 0.8rem; opacity: 0.9;">{{ lang.recommended_crops_count }}</div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #9b59b6, #8e44ad); padding: 15px; border-radius: 10px; color: white; text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold;">{{ form_data.temperature if form_data else '25' }}°C</div>
+                <div style="font-size: 0.8rem; opacity: 0.9;">{{ lang.temperature }}</div>
+            </div>
+            
+            <div style="background: linear-gradient(135deg, #f39c12, #f1c40f); padding: 15px; border-radius: 10px; color: white; text-align: center;">
+                <div style="font-size: 2rem; font-weight: bold;">{{ form_data.rainfall if form_data else '100' }}mm</div>
+                <div style="font-size: 0.8rem; opacity: 0.9;">{{ lang.rainfall }}</div>
+            </div>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div style="text-align: center; margin-top: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
+            <button onclick="printReport()" 
+                    style="background: #3498db; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; min-width: 120px;">
+                <i class="fas fa-print"></i> {{ lang.print_report }}
+            </button>
+            <button onclick="downloadCharts()" 
+                    style="background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 8px; min-width: 120px;">
+                <i class="fas fa-download"></i> {{ lang.save_result }}
+            </button>
+        </div>
+        
+    </div>
+    
+    {% else %}
+    <!-- Placeholder for Results -->
+    <div style="background: linear-gradient(135deg, #9b59b6, #8e44ad); padding: 30px; border-radius: 12px; text-align: center; margin-top: 30px;">
+        <div style="font-size: 60px; color: white; margin-bottom: 15px; opacity: 0.8;">
+            <i class="fas fa-chart-line"></i>
+        </div>
+        <h3 style="color: white; margin-bottom: 15px; font-size: 1.5rem;">{{ lang.no_analysis_yet }}</h3>
+        <p style="color: rgba(255,255,255,0.9); max-width: 600px; margin: 0 auto; line-height: 1.6; font-size: 0.95rem;">
+            {{ lang.fill_form_desc }} {{ lang.ai_powered_suggestions }}
+        </p>
+    </div>
+    {% endif %}
+    
+</div>
+
+<!-- JavaScript for Charts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if chart_data and recommendation %}
+    
+    console.log('Chart data available:', {{ chart_data|tojson }});
+    
+    // 1. Crop Suitability Bar Chart - FIXED with fallback
+    const suitCtx = document.getElementById('suitabilityChart');
+    if (suitCtx) {
+        let suitLabels = [];
+        let suitScores = [];
+        let suitColors = [];
+        
+        // Try to get data from chart_data
+        try {
+            if ({{ chart_data.suitability_chart|tojson }} && {{ chart_data.suitability_chart.labels|tojson }}) {
+                suitLabels = {{ chart_data.suitability_chart.labels|tojson }};
+                suitScores = {{ chart_data.suitability_chart.scores|tojson }};
+                suitColors = {{ chart_data.suitability_chart.colors|tojson }};
+            }
+        } catch (e) {
+            console.log('Error loading suitability chart data:', e);
+            // Fallback data
+            suitLabels = ['Rice', 'Wheat', 'Corn', 'Tomato', 'Potato'];
+            suitScores = [85, 78, 92, 67, 74];
+            suitColors = ['#4CAF50', '#8BC34A', '#CDDC39', '#FFC107', '#FF9800'];
+        }
+        
+        new Chart(suitCtx.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: suitLabels,
+                datasets: [{
+                    label: '{{ lang.suitability_score }}',
+                    data: suitScores,
+                    backgroundColor: suitColors,
+                    borderColor: suitColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        title: {
+                            display: true,
+                            text: '{{ lang.suitability_percentage }}'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 2. Soil Nutrients Pie Chart - FIXED with fallback
+    const nutCtx = document.getElementById('nutrientChart');
+    if (nutCtx) {
+        let nutLabels = ['Nitrogen', 'Phosphorous', 'Potassium'];
+        let nutData = [80, 40, 60];
+        let nutColors = ['#FF6B6B', '#4ECDC4', '#45B7D1'];
+        
+        try {
+            if ({{ chart_data.nutrient_chart|tojson }}) {
+                nutLabels = {{ chart_data.nutrient_chart.labels|tojson }};
+                nutData = {{ chart_data.nutrient_chart.data|tojson }};
+                nutColors = {{ chart_data.nutrient_chart.colors|tojson }};
+            }
+        } catch (e) {
+            console.log('Error loading nutrient chart data:', e);
+        }
+        
+        new Chart(nutCtx.getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: nutLabels,
+                datasets: [{
+                    data: nutData,
+                    backgroundColor: nutColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '{{ lang.nutrient_distribution }}'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 3. Environmental Line Chart - FIXED with fallback
+    const envCtx = document.getElementById('environmentChart');
+    if (envCtx) {
+        let envLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        let envDatasets = [
+            {
+                label: 'Temperature (°C)',
+                data: [25, 27, 30, 32, 31, 29, 28, 27, 26, 24, 22, 20],
+                borderColor: '#FF6384',
+                fill: false
+            },
+            {
+                label: 'Rainfall (mm)',
+                data: [20, 25, 40, 60, 80, 120, 150, 140, 100, 60, 30, 15],
+                borderColor: '#36A2EB',
+                fill: false
+            }
+        ];
+        
+        try {
+            if ({{ chart_data.environment_chart|tojson }}) {
+                envLabels = {{ chart_data.environment_chart.labels|tojson }};
+                envDatasets = {{ chart_data.environment_chart.datasets|tojson }};
+            }
+        } catch (e) {
+            console.log('Error loading environment chart data:', e);
+        }
+        
+        new Chart(envCtx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: envLabels,
+                datasets: envDatasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '{{ lang.environmental_trends }}'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '{{ lang.values }}'
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 4. Pest Risk Pie Chart - FIXED with fallback
+    const pestCtx = document.getElementById('pestChart');
+    if (pestCtx) {
+        let pestLabels = ['Armyworms', 'Corn Worms', 'Sap-Sucking Pests', 'Fruit Flies'];
+        let pestData = [40, 30, 20, 10];
+        let pestColors = ['#4CAF50', '#FFC107', '#F44336', '#9C27B0'];
+        
+        try {
+            if ({{ chart_data.pest_chart|tojson }}) {
+                pestLabels = {{ chart_data.pest_chart.labels|tojson }};
+                pestData = {{ chart_data.pest_chart.data|tojson }};
+                pestColors = {{ chart_data.pest_chart.colors|tojson }};
+            }
+        } catch (e) {
+            console.log('Error loading pest chart data:', e);
+        }
+        
+        new Chart(pestCtx.getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: pestLabels,
+                datasets: [{
+                    data: pestData,
+                    backgroundColor: pestColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '{{ lang.pest_risk_analysis }}'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}% risk`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // 5. Soil Type Pie Chart - FIXED with fallback
+    const soilCtx = document.getElementById('soilChart');
+    if (soilCtx) {
+        let soilLabels = ['Loamy', 'Clayey', 'Sandy', 'Silty', 'Other'];
+        let soilData = [40, 25, 20, 10, 5];
+        let soilColors = ['#8BC34A', '#795548', '#FF9800', '#607D8B', '#9E9E9E'];
+        
+        try {
+            if ({{ chart_data.soil_chart|tojson }}) {
+                soilLabels = {{ chart_data.soil_chart.labels|tojson }};
+                soilData = {{ chart_data.soil_chart.data|tojson }};
+                soilColors = {{ chart_data.soil_chart.colors|tojson }};
+            }
+        } catch (e) {
+            console.log('Error loading soil chart data:', e);
+        }
+        
+        new Chart(soilCtx.getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: soilLabels,
+                datasets: [{
+                    data: soilData,
+                    backgroundColor: soilColors,
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: '{{ lang.soil_composition }}'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.label}: ${context.raw}%`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    {% endif %}
+});
+
+// Utility Functions
+function printReport() {
+    window.print();
+}
+
+function downloadCharts() {
+    alert('{{ lang.download_feature|default("Download feature coming soon!") }}');
+}
+</script>
+
+<style>
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .container {
+        margin: 15px !important;
+        padding: 20px !important;
+    }
+    
+    h1 {
+        font-size: 2rem !important;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    .form-container {
+        margin-bottom: 25px !important;
+    }
+    
+    .results-section > div {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    .charts-row {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+    }
+    
+    /* FIXED: Generate Recommendation Button for Mobile */
+    button[type="submit"] {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 12px 20px !important;
+        font-size: 16px !important;
+    }
+    
+    /* Action Buttons for Mobile */
+    .action-buttons {
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+    
+    .action-buttons button {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 5px 0 !important;
+    }
+    
+    /* Quick Stats for Mobile */
+    .quick-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+    
+    .quick-stats-grid > div {
+        padding: 12px !important;
+    }
+    
+    .quick-stats-grid div div:first-child {
+        font-size: 1.5rem !important;
+    }
+    
+    /* Chart containers for mobile */
+    .chart-container {
+        height: 200px !important;
+    }
+    
+    /* Text adjustments */
+    p, .form-group label {
+        font-size: 0.9rem !important;
+    }
+    
+    /* Expert Analysis section */
+    .expert-analysis {
+        max-height: 250px !important;
+        font-size: 0.9rem !important;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .form-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .charts-row {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    button[type="submit"] {
+        max-width: 350px !important;
+    }
+}
+
+/* Additional Responsive Tweaks */
+@media (max-width: 480px) {
+    .container {
+        padding: 15px !important;
+        margin: 10px !important;
+    }
+    
+    h1 {
+        font-size: 1.8rem !important;
+    }
+    
+    h2, h3 {
+        font-size: 1.3rem !important;
+    }
+    
+    .form-group input, 
+    .form-group select {
+        padding: 10px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Even smaller quick stats */
+    .quick-stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .quick-stats-grid > div {
+        padding: 10px !important;
+    }
+    
+    .quick-stats-grid div div:first-child {
+        font-size: 1.3rem !important;
+    }
+    
+    .quick-stats-grid div div:last-child {
+        font-size: 0.75rem !important;
+    }
+    
+    /* Reduce padding in results section */
+    .results-section > div > div {
+        padding: 15px !important;
+    }
+}
+
+/* Hover effects for better UX */
+.form-group input:focus, 
+.form-group select:focus {
+    border-color: #27ae60 !important;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.2) !important;
+}
+
+button:hover {
+    transform: translateY(-2px) !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1) !important;
+}
+
+button[type="submit"]:hover {
+    box-shadow: 0 5px 20px rgba(39, 174, 96, 0.3) !important;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Ensure form elements are touch-friendly on mobile */
+@media (max-width: 768px) {
+    input, select, button {
+        font-size: 16px !important; /* Prevents iOS zoom on focus */
+    }
+    
+    button {
+        min-height: 44px !important; /* Minimum touch target size */
+    }
+}
+
+/* Fix for overflowing text in crop list */
+.recommended-crops div {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Ensure charts don't overflow on mobile */
+canvas {
+    max-width: 100%;
+    height: auto !important;
+}
+</style>
+{% endblock %}

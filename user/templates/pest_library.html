@@ -1,0 +1,1495 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<style>
+    /* ============================================
+       PEST LIBRARY - MODERN REDESIGN
+       Clean, professional, dark theme
+    ============================================ */
+    
+    /* CSS Variables for easy customization */
+    :root {
+        /* Color Palette */
+        --primary-dark: #0f172a;
+        --secondary-dark: #1e293b;
+        --card-dark: #1e293b;
+        --accent-green: #10b981;
+        --accent-orange: #f59e0b;
+        --accent-blue: #3b82f6;
+        --accent-cyan: #06b6d4;
+        --accent-purple: #8b5cf6;
+        --accent-red: #ef4444;
+        
+        /* Text Colors */
+        --text-primary: #f8fafc;
+        --text-secondary: #cbd5e1;
+        --text-muted: #94a3b8;
+        
+        /* Borders & Shadows */
+        --border-light: rgba(255, 255, 255, 0.1);
+        --border-medium: rgba(255, 255, 255, 0.15);
+        --border-strong: rgba(255, 255, 255, 0.2);
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+        
+        /* Spacing */
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --radius-lg: 14px;
+        --radius-xl: 20px;
+        
+        /* Transitions */
+        --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+        --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    /* Reset & Base Styles */
+    .pest-library-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 1.5rem;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        color: var(--text-primary);
+        background: var(--primary-dark);
+        min-height: 100vh;
+    }
+    
+    /* ========== HEADERS ========== */
+    .admin-header {
+        background: linear-gradient(135deg, 
+            var(--primary-dark) 0%, 
+            rgba(239, 68, 68, 0.15) 50%, 
+            var(--primary-dark) 100%);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-xl);
+        padding: 3.5rem 2rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .admin-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            var(--accent-red), 
+            transparent);
+    }
+    
+    .admin-header h1 {
+        font-size: 2.75rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent-red), var(--accent-orange));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        letter-spacing: -0.025em;
+    }
+    
+    .library-hero {
+        background: linear-gradient(135deg, 
+            var(--primary-dark) 0%, 
+            rgba(16, 185, 129, 0.15) 50%, 
+            var(--primary-dark) 100%);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-xl);
+        padding: 3.5rem 2rem;
+        margin-bottom: 2.5rem;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .library-hero::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            var(--accent-green), 
+            transparent);
+    }
+    
+    .library-hero h1 {
+        font-size: 2.75rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--accent-orange), var(--accent-green));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 1rem;
+        letter-spacing: -0.025em;
+    }
+    
+    .hero-subtitle {
+        font-size: 1.125rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+        max-width: 42rem;
+        margin: 0 auto 2rem;
+    }
+    
+    /* ========== ADMIN CONTROLS ========== */
+    .admin-actions-bar {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+    
+    .admin-btn {
+        padding: 0.875rem 1.75rem;
+        border-radius: var(--radius-md);
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all var(--transition-base);
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 0.025em;
+    }
+    
+    .admin-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.1), 
+            transparent);
+        transition: left var(--transition-slow);
+    }
+    
+    .admin-btn:hover::before {
+        left: 100%;
+    }
+    
+    .add-btn {
+        background: linear-gradient(135deg, #059669, #10b981);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .migrate-btn {
+        background: linear-gradient(135deg, #0891b2, #06b6d4);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .cleanup-btn {
+        background: linear-gradient(135deg, #475569, #64748b);
+        color: white;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .admin-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .admin-btn:active {
+        transform: translateY(0);
+    }
+    
+    /* ========== DATABASE INFO ========== */
+    .database-info {
+        background: var(--card-dark);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        margin-bottom: 2rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    .database-info h3 {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--accent-red);
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .db-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .db-stat {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-md);
+        padding: 1.25rem;
+        text-align: center;
+        transition: all var(--transition-base);
+    }
+    
+    .db-stat:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--border-medium);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .db-value {
+        font-size: 2rem;
+        font-weight: 800;
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.025em;
+    }
+    
+    .db-label {
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    .predefined-warning {
+        background: rgba(245, 158, 11, 0.08);
+        border-left: 3px solid var(--accent-orange);
+        border-radius: 0 var(--radius-md) var(--radius-md) 0;
+        padding: 1rem;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+    }
+    
+    .predefined-warning i {
+        color: var(--accent-orange);
+        margin-right: 0.5rem;
+    }
+    
+    /* ========== TYPE BADGES ========== */
+    .type-badge {
+        position: absolute;
+        top: 1rem;
+        left: 1rem;
+        padding: 0.375rem 0.875rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        z-index: 10;
+        backdrop-filter: blur(8px);
+        border: 1px solid transparent;
+    }
+    
+    .type-predefined {
+        background: rgba(6, 182, 212, 0.15);
+        color: var(--accent-cyan);
+        border-color: rgba(6, 182, 212, 0.3);
+    }
+    
+    .type-custom {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--accent-green);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    
+    /* ========== STATS CARDS ========== */
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .stat-card {
+        background: var(--card-dark);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        text-align: center;
+        transition: all var(--transition-base);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-green), var(--accent-orange));
+        opacity: 0;
+        transition: opacity var(--transition-base);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--border-strong);
+    }
+    
+    .stat-card:hover::before {
+        opacity: 1;
+    }
+    
+    .stat-value {
+        font-size: 2.25rem;
+        font-weight: 800;
+        color: var(--accent-orange);
+        margin-bottom: 0.25rem;
+        letter-spacing: -0.025em;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    
+    /* ========== SEARCH & FILTERS ========== */
+    .search-filters {
+        background: var(--card-dark);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        margin-bottom: 2.5rem;
+        backdrop-filter: blur(10px);
+    }
+    
+    .search-container {
+        display: grid;
+        grid-template-columns: 1fr auto auto;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    @media (max-width: 768px) {
+        .search-container {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .search-box {
+        position: relative;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.875rem 1rem 0.875rem 3rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        transition: all var(--transition-base);
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: var(--accent-green);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        transition: color var(--transition-base);
+    }
+    
+    .search-input:focus + .search-icon {
+        color: var(--accent-green);
+    }
+    
+    .filter-select {
+        padding: 0.875rem 1rem;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-md);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        min-width: 180px;
+        cursor: pointer;
+        transition: all var(--transition-base);
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        background-size: 12px;
+        padding-right: 2.5rem;
+    }
+    
+    .filter-select:focus {
+        outline: none;
+        border-color: var(--accent-green);
+        box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .filter-select option {
+        background: var(--secondary-dark);
+        color: var(--text-primary);
+        padding: 0.75rem;
+    }
+    
+    /* ========== PEST GRID ========== */
+    .pest-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 1.75rem;
+        margin-bottom: 3rem;
+    }
+    
+    @media (max-width: 1200px) {
+        .pest-grid {
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .pest-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+    
+    /* ========== PEST CARD ========== */
+    .pest-card {
+        background: var(--card-dark);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: all var(--transition-base);
+        position: relative;
+        height: 100%;
+    }
+    
+    .pest-card:hover {
+        transform: translateY(-6px);
+        border-color: var(--accent-green);
+        box-shadow: var(--shadow-xl);
+    }
+    
+    .pest-card.new::after {
+        content: 'NEW';
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: linear-gradient(135deg, var(--accent-orange), #f97316);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        z-index: 10;
+        box-shadow: var(--shadow-md);
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+    
+    /* ========== IMAGE ========== */
+    .pest-image-container {
+        width: 100%;
+        height: 190px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .pest-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform var(--transition-slow);
+    }
+    
+    .pest-card:hover .pest-image {
+        transform: scale(1.08);
+    }
+    
+    .pest-image-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, 
+            rgba(16, 185, 129, 0.1), 
+            rgba(245, 158, 11, 0.1));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .pest-image-placeholder i {
+        font-size: 3rem;
+        color: rgba(255, 255, 255, 0.15);
+    }
+    
+    /* ========== CARD CONTENT ========== */
+    .pest-content {
+        padding: 2.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .pest-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        gap: 0.75rem;
+    }
+    
+    .pest-name-container {
+        flex: 1;
+        min-width: 0;
+    }
+    
+    .pest-name {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin: 0;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .pest-scientific {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        font-style: italic;
+        margin-top: 0.25rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    /* ========== SEVERITY BADGE ========== */
+    .severity-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 2rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        white-space: nowrap;
+        flex-shrink: 0;
+        border: 1px solid transparent;
+    }
+    
+    .severity-low {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--accent-green);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    
+    .severity-medium {
+        background: rgba(245, 158, 11, 0.15);
+        color: var(--accent-orange);
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+    
+    .severity-high {
+        background: rgba(239, 68, 68, 0.15);
+        color: var(--accent-red);
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+    
+    .severity-very-high {
+        background: rgba(220, 38, 38, 0.15);
+        color: #dc2626;
+        border-color: rgba(220, 38, 38, 0.3);
+    }
+    
+    /* ========== DESCRIPTION ========== */
+    .pest-description {
+        color: var(--text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.25rem;
+        flex: 1;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    /* ========== META INFO ========== */
+    .pest-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.25rem;
+    }
+    
+    .meta-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        background: rgba(255, 255, 255, 0.05);
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--radius-sm);
+        border: 1px solid var(--border-light);
+        transition: all var(--transition-fast);
+    }
+    
+    .meta-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: var(--border-medium);
+        transform: translateY(-1px);
+    }
+    
+    .meta-item i {
+        color: var(--accent-green);
+        font-size: 0.875rem;
+    }
+    
+    /* ========== ACTION BUTTONS ========== */
+    .pest-actions-admin,
+    .pest-actions {
+        display: flex;
+        gap: 0.75rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid var(--border-light);
+        margin-top: auto;
+    }
+    
+    .action-btn-admin,
+    .action-btn {
+        flex: 1;
+        padding: 0.75rem;
+        border-radius: var(--radius-md);
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        text-align: center;
+        transition: all var(--transition-base);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        border: 1px solid;
+        letter-spacing: 0.025em;
+    }
+    
+    .view-btn-admin {
+        background: rgba(59, 130, 246, 0.1);
+        color: var(--accent-blue);
+        border-color: rgba(59, 130, 246, 0.3);
+    }
+    
+    .edit-btn-admin {
+        background: rgba(245, 158, 11, 0.1);
+        color: var(--accent-orange);
+        border-color: rgba(245, 158, 11, 0.3);
+    }
+    
+    .delete-btn-admin {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--accent-red);
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+    
+    .view-btn {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--accent-green);
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+    
+    .action-btn-admin:hover,
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    /* ========== BULK ACTIONS ========== */
+    .bulk-actions {
+        background: var(--card-dark);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        margin-top: 2rem;
+    }
+    
+    .bulk-select {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+    
+    .bulk-checkbox {
+        width: 1.125rem;
+        height: 1.125rem;
+        cursor: pointer;
+        accent-color: var(--accent-green);
+    }
+    
+    .bulk-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+    
+    /* ========== EMPTY STATE ========== */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--card-dark);
+        border: 2px dashed var(--border-medium);
+        border-radius: var(--radius-lg);
+        margin: 2rem 0;
+    }
+    
+    .empty-state i {
+        font-size: 4rem;
+        color: var(--accent-green);
+        margin-bottom: 1.5rem;
+        opacity: 0.5;
+    }
+    
+    .empty-state h3 {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 0.75rem;
+    }
+    
+    .empty-state p {
+        color: var(--text-secondary);
+        max-width: 32rem;
+        margin: 0 auto 1.5rem;
+        line-height: 1.7;
+    }
+    
+    /* ========== KNOWLEDGE SECTION ========== */
+    .knowledge-section {
+        background: var(--card-dark);
+        border: 1px solid var(--border-medium);
+        border-radius: var(--radius-xl);
+        padding: 3rem;
+        margin-top: 4rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .knowledge-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, 
+            transparent, 
+            var(--accent-orange), 
+            transparent);
+    }
+    
+    .knowledge-header {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 2.5rem;
+    }
+    
+    .knowledge-header i {
+        font-size: 2.5rem;
+        color: var(--accent-orange);
+    }
+    
+    .knowledge-header h2 {
+        font-size: 1.875rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        letter-spacing: -0.025em;
+    }
+    
+    .knowledge-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.75rem;
+    }
+    
+    .knowledge-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid var(--border-light);
+        border-radius: var(--radius-lg);
+        padding: 1.75rem;
+        transition: all var(--transition-base);
+    }
+    
+    .knowledge-card:hover {
+        background: rgba(255, 255, 255, 0.05);
+        border-color: var(--border-medium);
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .knowledge-card h4 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--accent-green);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+    
+    .knowledge-card ul {
+        padding-left: 1.25rem;
+        color: var(--text-secondary);
+        line-height: 1.7;
+    }
+    
+    .knowledge-card li {
+        margin-bottom: 0.5rem;
+        position: relative;
+        padding-left: 0.5rem;
+    }
+    
+    .knowledge-card li::marker {
+        color: var(--accent-green);
+    }
+    
+    /* ========== ADMIN CHECKBOX ========== */
+    .pest-checkbox {
+        width: 1.125rem;
+        height: 1.125rem;
+        cursor: pointer;
+        accent-color: var(--accent-red);
+        margin-left: 0.5rem;
+        flex-shrink: 0;
+    }
+    
+    /* ========== RESPONSIVE UTILITIES ========== */
+    @media (max-width: 640px) {
+        .admin-header h1,
+        .library-hero h1 {
+            font-size: 2.25rem;
+        }
+        
+        .knowledge-section {
+            padding: 2rem 1.5rem;
+        }
+        
+        .knowledge-header h2 {
+            font-size: 1.5rem;
+        }
+    }
+    
+    /* ========== ANIMATIONS ========== */
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .pest-card {
+        animation: fadeIn 0.5s ease-out forwards;
+        opacity: 0;
+    }
+    
+    .pest-card:nth-child(1) { animation-delay: 0.1s; }
+    .pest-card:nth-child(2) { animation-delay: 0.2s; }
+    .pest-card:nth-child(3) { animation-delay: 0.3s; }
+    .pest-card:nth-child(4) { animation-delay: 0.4s; }
+    .pest-card:nth-child(5) { animation-delay: 0.5s; }
+    .pest-card:nth-child(6) { animation-delay: 0.6s; }
+    .pest-card:nth-child(7) { animation-delay: 0.7s; }
+    .pest-card:nth-child(8) { animation-delay: 0.8s; }
+    .pest-card:nth-child(9) { animation-delay: 0.9s; }
+</style>
+
+<div class="pest-library-container">
+    {% if is_admin %}
+    <!-- Admin Hero Section -->
+    <div class="admin-header">
+        <h1><i class="fas fa-tools"></i> Pest Library Management</h1>
+        <p class="hero-subtitle">
+            Manage the complete pest database. Add new pests, edit existing ones, and control what appears in the public library. Predefined pests (from pest_library.py) cannot be edited or deleted.
+        </p>
+        
+        <!-- Admin Action Buttons -->
+        <div class="admin-actions-bar">
+            <a href="{{ url_for('admin_add_pest') }}" class="admin-btn add-btn">
+                <i class="fas fa-plus-circle"></i> Add New Pest
+            </a>
+            
+            {% if session.get('role') == 'admin' %}
+            <a href="{{ url_for('migrate_pests') }}" 
+               class="admin-btn migrate-btn"
+               onclick="return confirm('This will migrate pests from uploads to the library. Continue?')">
+                <i class="fas fa-database"></i> Migrate from Uploads
+            </a>
+            
+            <a href="{{ url_for('cleanup_pests') }}" 
+               class="admin-btn cleanup-btn"
+               onclick="return confirm('This will clean up pest database. Continue?')">
+                <i class="fas fa-broom"></i> Cleanup Database
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Database Information -->
+    <div class="database-info">
+        <h3 style="color: #dc3545; margin-bottom: 15px;">
+            <i class="fas fa-database"></i> Database Information
+        </h3>
+        
+        <div class="db-stats">
+            <div class="db-stat">
+                <div class="db-value total">{{ total_pests }}</div>
+                <div class="db-label">Total Pests</div>
+            </div>
+            <div class="db-stat">
+                <div class="db-value predefined">{{ predefined_pests_count }}</div>
+                <div class="db-label">Predefined</div>
+            </div>
+            <div class="db-stat">
+                <div class="db-value custom">{{ custom_pests_count }}</div>
+                <div class="db-label">Custom</div>
+            </div>
+            <div class="db-stat">
+                <div class="db-value">{{ new_pests_count }}</div>
+                <div class="db-label">New (Last 5 Days)</div>
+            </div>
+        </div>
+        
+        <div class="predefined-warning">
+            <i class="fas fa-exclamation-triangle"></i>
+            <strong>Note:</strong> Predefined pests (from pest_library.py) are read-only and cannot be edited or deleted. Only custom pests (added via admin panel) can be modified.
+        </div>
+    </div>
+    {% else %}
+    <!-- User Hero Section -->
+    <div class="library-hero">
+        <h1><i class="fas fa-book-medical"></i> Pest Library</h1>
+        <p class="hero-subtitle">
+            Your comprehensive digital encyclopedia for identifying, understanding, and managing agricultural pests. Access detailed information, prevention strategies, and control methods for effective crop protection.
+        </p>
+    </div>
+    {% endif %}
+    
+    <!-- Statistics -->
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-value">{{ total_pests }}</div>
+            <div class="stat-label">Total Pests</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ high_severity_count }}</div>
+            <div class="stat-label">High Severity</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ new_pests_count }}</div>
+            <div class="stat-label">Newly Added</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value">{{ custom_pests_count if is_admin else predefined_pests_count }}</div>
+            <div class="stat-label">{% if is_admin %}Custom Pests{% else %}Predefined Pests{% endif %}</div>
+        </div>
+    </div>
+    
+    <!-- Enhanced Search and Filters -->
+    <div class="search-filters">
+        <div class="search-container">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       class="search-input" 
+                       placeholder="Search pests by name, scientific name, or description..."
+                       id="searchInput">
+            </div>
+            <select class="filter-select" id="severityFilter">
+                <option value="all">All Severity Levels</option>
+                <option value="low">Low Severity</option>
+                <option value="medium">Medium Severity</option>
+                <option value="high">High Severity</option>
+                <option value="very_high">Very High Severity</option>
+            </select>
+            <select class="filter-select" id="typeFilter">
+                <option value="all">All Types</option>
+                <option value="predefined">Predefined Only</option>
+                <option value="custom">Custom Only</option>
+            </select>
+        </div>
+        
+        {% if is_admin %}
+        <!-- Bulk Actions (Admin Only) -->
+        <div class="bulk-actions" style="display: none;" id="bulkActions">
+            <div class="bulk-select">
+                <input type="checkbox" id="selectAll" class="bulk-checkbox">
+                <label for="selectAll" style="color: #fff; cursor: pointer; font-weight: 500;">
+                    Select All (Custom pests only)
+                </label>
+                <span id="selectedCount" style="margin-left: auto; color: #0dcaf0; font-weight: 600;">0 selected</span>
+            </div>
+            <div class="bulk-buttons">
+                <button class="admin-btn" 
+                        style="background: #dc3545; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;"
+                        onclick="deleteSelectedPests()">
+                    <i class="fas fa-trash"></i> Delete Selected
+                </button>
+                <button class="admin-btn" 
+                        style="background: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;"
+                        onclick="clearSelection()">
+                    <i class="fas fa-times"></i> Clear Selection
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- Pest Cards Grid -->
+    {% if pests %}
+    <div class="pest-grid" id="pestGrid">
+        {% for pest in pests %}
+        <div class="pest-card {% if pest.is_new %}new{% endif %}" 
+             data-severity="{{ pest.severity }}"
+             data-name="{{ pest.name.lower() }}"
+             data-scientific="{{ pest.scientific_name.lower() if pest.scientific_name else '' }}"
+             data-type="{{ pest.pest_type if pest.pest_type else 'predefined' }}"
+             data-id="{{ pest.id if 'id' in pest else pest._id if '_id' in pest else pest.name }}"
+             id="pest-{{ pest.id if 'id' in pest else pest._id if '_id' in pest else pest.name }}">
+            
+            {% if is_admin %}
+            <!-- Pest Type Badge (Admin Only) -->
+            <span class="type-badge type-{{ pest.pest_type if pest.pest_type else 'predefined' }}">
+                {{ pest.pest_type if pest.pest_type else 'predefined' }}
+            </span>
+            {% endif %}
+            
+            <!-- Image Container -->
+            <div class="pest-image-container">
+                {% if pest.image_url %}
+                    {% if pest.image_url.startswith('http') or pest.image_url.startswith('//') %}
+                        <img src="{{ pest.image_url }}" 
+                             alt="{{ pest.name }}" 
+                             class="pest-image" 
+                             loading="lazy"
+                             onerror="handleImageError(this)">
+                    {% elif pest.image_url.startswith('/static/') %}
+                        <img src="{{ pest.image_url }}" 
+                             alt="{{ pest.name }}" 
+                             class="pest-image" 
+                             loading="lazy"
+                             onerror="handleImageError(this)">
+                    {% else %}
+                        <img src="/static/images/pests/{{ pest.image_url }}" 
+                             alt="{{ pest.name }}" 
+                             class="pest-image" 
+                             loading="lazy"
+                             onerror="handleImageError(this)">
+                    {% endif %}
+                {% else %}
+                    <div class="pest-image-placeholder">
+                        <i class="fas fa-bug"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="pest-content">
+                <div class="pest-header">
+                    <div class="pest-name-container">
+                        <h3 class="pest-name">{{ pest.name }}</h3>
+                        {% if pest.scientific_name %}
+                        <div class="pest-scientific">{{ pest.scientific_name }}</div>
+                        {% endif %}
+                    </div>
+                    <span class="severity-badge severity-{{ pest.severity }}">
+                        {{ pest.severity.replace('_', ' ').title() }}
+                    </span>
+                </div>
+                
+                <p class="pest-description">
+                    {{ pest.description[:150] }}{% if pest.description|length > 150 %}...{% endif %}
+                </p>
+                
+                <div class="pest-meta">
+                    {% if pest.harmful_effects %}
+                    <div class="meta-item">
+                        <i class="fas fa-skull-crossbones"></i>
+                        <span>
+                            {% if pest.harmful_effects is string %}
+                                {{ pest.harmful_effects.split('\n')|length }}
+                            {% else %}
+                                {{ pest.harmful_effects|length }}
+                            {% endif %}
+                             Effects
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if pest.organic_solutions %}
+                    <div class="meta-item">
+                        <i class="fas fa-leaf"></i>
+                        <span>
+                            {% if pest.organic_solutions is string %}
+                                {{ pest.organic_solutions.split('\n')|length }}
+                            {% else %}
+                                {{ pest.organic_solutions|length }}
+                            {% endif %}
+                             Solutions
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if pest.created_at %}
+                    <div class="meta-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Added: {{ pest.created_at.strftime('%b %d, %Y') if pest.created_at is not string else pest.created_at[:10] }}</span>
+                    </div>
+                    {% endif %}
+                    
+                    {% if pest.detection_count %}
+                    <div class="meta-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Detected: {{ pest.detection_count }} times</span>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Action Buttons -->
+                {% if is_admin %}
+                <!-- ADMIN ACTIONS - View + Edit/Delete for custom pests -->
+                <div class="pest-actions-admin">
+                    <!-- View button for all pests -->
+                    <a href="{{ url_for('view_pest_details', pest_id=pest.id if 'id' in pest else pest._id if '_id' in pest else pest.name) }}" 
+                       class="action-btn-admin view-btn-admin">
+                        <i class="fas fa-eye"></i> View
+                    </a>
+                    
+                    {% if pest.pest_type == 'custom' or pest.pest_type == 'admin_added' %}
+                    <!-- Edit button (only for custom pests) -->
+                    <a href="{{ url_for('admin_edit_pest', pest_id=pest._id) }}" 
+                       class="action-btn-admin edit-btn-admin">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    
+                    <!-- Delete button (only for custom pests) -->
+                    <button class="action-btn-admin delete-btn-admin" 
+                            onclick="deletePest('{{ pest._id }}', '{{ pest.name }}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    
+                    <!-- Bulk selection checkbox (only for custom pests) -->
+                    <input type="checkbox" 
+                           class="bulk-checkbox pest-checkbox" 
+                           data-pest-id="{{ pest._id }}"
+                           data-pest-name="{{ pest.name }}"
+                           style="width: 18px; height: 18px; cursor: pointer;">
+                    {% endif %}
+                </div>
+                {% else %}
+                <!-- USER ONLY ACTIONS - Just View Details -->
+                <div class="pest-actions">
+                    <a href="{{ url_for('view_pest_details', pest_id=pest.id if 'id' in pest else pest._id if '_id' in pest else pest.name) }}" 
+                       class="action-btn view-btn">
+                        <i class="fas fa-eye"></i> View Details
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <!-- Empty State -->
+    <div class="empty-state">
+        <i class="fas fa-book"></i>
+        <h3>No Pests Found</h3>
+        <p>The pest library is currently empty.</p>
+        {% if is_admin %}
+        <a href="{{ url_for('admin_add_pest') }}" 
+           style="display: inline-block; 
+                  margin-top: 20px; 
+                  padding: 12px 30px; 
+                  background: linear-gradient(135deg, #28a745, #20c997); 
+                  color: white; 
+                  text-decoration: none; 
+                  border-radius: 8px;
+                  font-weight: 600;
+                  transition: all 0.3s;">
+            <i class="fas fa-plus-circle"></i> Add Your First Pest
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+    
+    <!-- Knowledge Section -->
+    <div class="knowledge-section">
+        <div class="knowledge-header">
+            <i class="fas fa-graduation-cap"></i>
+            <h2>About Pest Management</h2>
+        </div>
+        <div class="knowledge-grid">
+            <div class="knowledge-card">
+                <h4><i class="fas fa-crosshairs"></i> Identification Tips</h4>
+                <ul>
+                    <li>Look for characteristic damage patterns on leaves</li>
+                    <li>Observe pest behavior and feeding times</li>
+                    <li>Check underside of leaves for eggs or larvae</li>
+                    <li>Use magnifying glass for small pests</li>
+                    <li>Note seasonal patterns and weather conditions</li>
+                </ul>
+            </div>
+            <div class="knowledge-card">
+                <h4><i class="fas fa-shield-alt"></i> Prevention Strategies</h4>
+                <ul>
+                    <li>Practice crop rotation regularly</li>
+                    <li>Maintain proper field sanitation</li>
+                    <li>Use resistant crop varieties</li>
+                    <li>Implement biological controls</li>
+                    <li>Monitor fields regularly</li>
+                </ul>
+            </div>
+            <div class="knowledge-card">
+                <h4><i class="fas fa-exclamation-triangle"></i> Quick Actions</h4>
+                <ul>
+                    <li>Isolate infected plants immediately</li>
+                    <li>Apply organic treatments first</li>
+                    <li>Document pest progression</li>
+                    <li>Consult experts for severe infestations</li>
+                    <li>Follow safety protocols with chemicals</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== SEARCH AND FILTER ====================
+    const searchInput = document.getElementById('searchInput');
+    const severityFilter = document.getElementById('severityFilter');
+    const typeFilter = document.getElementById('typeFilter');
+    const pestGrid = document.getElementById('pestGrid');
+    
+    function filterAndSortPests() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedSeverity = severityFilter.value;
+        const selectedType = typeFilter.value;
+        
+        const pestCards = Array.from(document.querySelectorAll('.pest-card'));
+        
+        pestCards.forEach(card => {
+            const name = card.dataset.name;
+            const scientific = card.dataset.scientific;
+            const severity = card.dataset.severity;
+            const type = card.dataset.type;
+            
+            // Filter by search term
+            const matchesSearch = searchTerm === '' || 
+                name.includes(searchTerm) || 
+                scientific.includes(searchTerm);
+            
+            // Filter by severity
+            const matchesSeverity = selectedSeverity === 'all' || severity === selectedSeverity;
+            
+            // Filter by type
+            const matchesType = selectedType === 'all' || type === selectedType;
+            
+            // Show/hide card
+            card.style.display = (matchesSearch && matchesSeverity && matchesType) ? 'flex' : 'none';
+        });
+        
+        {% if is_admin %}
+        updateBulkActions();
+        {% endif %}
+    }
+    
+    // Event Listeners for filters
+    if (searchInput) searchInput.addEventListener('input', filterAndSortPests);
+    if (severityFilter) severityFilter.addEventListener('change', filterAndSortPests);
+    if (typeFilter) typeFilter.addEventListener('change', filterAndSortPests);
+    
+    // Image error handling
+    function handleImageError(img) {
+        img.parentElement.innerHTML = '<div class="pest-image-placeholder"><i class="fas fa-bug"></i></div>';
+    }
+    
+    // ==================== ADMIN JAVASCRIPT ====================
+    {% if is_admin %}
+    const bulkActions = document.getElementById('bulkActions');
+    const selectAllCheckbox = document.getElementById('selectAll');
+    const selectedCount = document.getElementById('selectedCount');
+    
+    // Update bulk actions visibility
+    function updateBulkActions() {
+        const checkboxes = document.querySelectorAll('.pest-checkbox:checked');
+        const visibleCheckboxes = Array.from(document.querySelectorAll('.pest-checkbox')).filter(cb => {
+            const card = cb.closest('.pest-card');
+            return card && card.style.display !== 'none';
+        });
+        
+        if (checkboxes.length > 0) {
+            bulkActions.style.display = 'block';
+            selectedCount.textContent = `${checkboxes.length} selected`;
+            
+            // Update select all state
+            const visibleChecked = visibleCheckboxes.filter(cb => cb.checked);
+            selectAllCheckbox.checked = visibleChecked.length === visibleCheckboxes.length && visibleCheckboxes.length > 0;
+            selectAllCheckbox.indeterminate = visibleChecked.length > 0 && visibleChecked.length < visibleCheckboxes.length;
+        } else {
+            bulkActions.style.display = 'none';
+        }
+    }
+    
+    // Select all functionality
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', function() {
+            const visibleCheckboxes = Array.from(document.querySelectorAll('.pest-checkbox')).filter(cb => {
+                const card = cb.closest('.pest-card');
+                return card && card.style.display !== 'none';
+            });
+            
+            visibleCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            
+            updateBulkActions();
+        });
+    }
+    
+    // Individual checkbox change
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('pest-checkbox')) {
+            updateBulkActions();
+        }
+    });
+    
+    // Delete pest function
+    function deletePest(pestId, pestName) {
+        if (confirm(`Are you sure you want to delete pest "${pestName}"?`)) {
+            fetch(`/admin/delete-pest/${pestId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    // Remove the pest card from DOM
+                    const pestCard = document.getElementById(`pest-${pestId}`);
+                    if (pestCard) {
+                        pestCard.remove();
+                        updateCounters();
+                    }
+                } else {
+                    alert('An error occurred. Please try again.: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+        }
+    }
+    
+    // Delete selected pests
+    function deleteSelectedPests() {
+        const selectedCheckboxes = document.querySelectorAll('.pest-checkbox:checked');
+        
+        if (selectedCheckboxes.length === 0) {
+            alert('Please select pests to delete.');
+            return;
+        }
+        
+        const pestNames = Array.from(selectedCheckboxes).map(cb => cb.dataset.pestName);
+        
+        if (confirm(`Are you sure you want to delete ${selectedCheckboxes.length} selected pests?\n\n${pestNames.join(', ')}`)) {
+            const deletePromises = Array.from(selectedCheckboxes).map(checkbox => {
+                const pestId = checkbox.dataset.pestId;
+                return fetch(`/admin/delete-pest/${pestId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }).then(response => response.json());
+            });
+            
+            Promise.all(deletePromises)
+                .then(results => {
+                    const successful = results.filter(r => r.success);
+                    const failed = results.filter(r => !r.success);
+                    
+                    alert(`Deleted ${successful.length} pests successfully. ${failed.length} failed.`);
+                    
+                    // Remove all selected cards
+                    selectedCheckboxes.forEach(checkbox => {
+                        const card = checkbox.closest('.pest-card');
+                        if (card) card.remove();
+                    });
+                    
+                    updateCounters();
+                    updateBulkActions();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        }
+    }
+    
+    // Clear selection
+    function clearSelection() {
+        document.querySelectorAll('.pest-checkbox').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        if (selectAllCheckbox) {
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        }
+        updateBulkActions();
+    }
+    
+    // Update counters after deletion
+    function updateCounters() {
+        if (bulkActions) bulkActions.style.display = 'none';
+    }
+    
+    // Initialize admin checkboxes
+    document.querySelectorAll('.pest-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+    {% endif %}
+</script>
+{% endblock %}

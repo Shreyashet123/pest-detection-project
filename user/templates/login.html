@@ -1,0 +1,1182 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<div class="form-container">
+    <div class="form-box">
+        <h2>🚀 Get Started</h2>
+        <p class="welcome-text">Welcome to Pest Detection System</p>
+        
+        <!-- Flash Messages - Will auto-hide when form validation is active -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages" id="backend-flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        <i class="fas 
+                            {% if category == 'success' %}fa-check-circle
+                            {% elif category == 'danger' %}fa-exclamation-circle
+                            {% elif category == 'warning' %}fa-exclamation-triangle
+                            {% else %}fa-info-circle{% endif %}"></i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+        
+        <!-- UNIFIED FORM - BOTH LOGIN & REGISTER -->
+        <form method="POST" action="{{ url_for('process_auth') }}" id="authForm">
+              <input type="hidden" name="action" id="form-action" value="signin">
+            <div class="input-group">
+                <!-- First Name Field (hidden in sign-in mode) -->
+                <div class="input-field" id="first-name-field" style="display: none;">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" name="first_name" id="first_name" placeholder="First Name">
+                </div>
+                
+                <!-- Last Name Field (hidden in sign-in mode) -->
+                <div class="input-field" id="last-name-field" style="display: none;">
+                    <i class="fa-solid fa-user"></i>
+                    <input type="text" name="last_name" id="last_name" placeholder="Last Name">
+                </div>
+                
+                <!-- Email Field -->
+                <div class="input-field">
+                    <i class="fa-solid fa-envelope"></i>
+                    <input type="email" name="email" id="email" placeholder="Email Address" required 
+                           oninput="checkEmailExists()">
+                    <div id="email-status" style="display: none; font-size: 12px; margin-top: 5px;"></div>
+                </div>
+                
+                <!-- Password Field -->
+                <div class="input-field password-field">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="password" id="password" placeholder="Password ••••••••" required>
+                    <button type="button" class="toggle-password" onclick="togglePassword('password')" tabindex="-1">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                
+                <!-- Confirm Password Field (only for Join Now) -->
+                <div class="input-field password-field" id="confirm-password-field" style="display: none;">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm Password ••••••••">
+                    <button type="button" class="toggle-password" onclick="togglePassword('confirm_password')" title="Show password">
+                        <i class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+                
+                <!-- TWO BUTTONS SIDE-BY-SIDE (Sign In Mode) -->
+               <div class="dual-buttons" id="signin-mode-buttons" style="margin-top: 20px; clear: both;">
+                    <button type="submit" name="action" value="signin" class="btn-login" id="signin-btn">
+                        <i class="fa-solid fa-sign-in-alt"></i> Sign In
+                    </button>
+                    <button type="button" class="btn-register" id="join-btn" onclick="switchToRegistrationMode()">
+                        <i class="fa-solid fa-user-plus"></i> Join Now
+                    </button>
+                </div>
+                
+                <!-- SINGLE BUTTON (Registration Mode) -->
+                <div class="dual-buttons" id="register-mode-buttons" style="display: none;">
+                    <button type="submit" name="action" value="join" class="btn-register" id="create-account-btn" style="width: 100%;">
+                        <i class="fa-solid fa-user-plus"></i> Create Account
+                    </button>
+                </div>
+                
+                <!-- Back to Sign In Link (shown only in registration mode) -->
+                <div class="links" id="back-to-signin" style="display: none; margin-top: 10px;">
+                    <p>Already have an account? <a href="javascript:void(0);" onclick="switchToSignInMode()">Sign In</a></p>
+                </div>
+                
+                <!-- Password Requirements -->
+                <div id="password-requirements" style="display: none; margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 5px; font-size: 13px;">
+                    <p style="margin: 0 0 5px 0; color: #666;"><strong>Password must have:</strong></p>
+                    <ul style="margin: 0; padding-left: 20px; color: #666;">
+                        <li id="req-length">✓ At least 8 characters</li>
+                        <li id="req-uppercase">✓ One uppercase letter</li>
+                        <li id="req-lowercase">✓ One lowercase letter</li>
+                        <li id="req-number">✓ One number</li>
+                        <li id="req-match" style="display: none;">✓ Passwords match</li>
+                    </ul>
+                </div>
+            </div>
+        </form>
+        
+        <!-- Divider -->
+        <div class="divider">
+            <span>or continue with</span>
+        </div>
+        
+        <!-- Google Login/Signup -->
+        {% if GOOGLE_CLIENT_ID %}
+        <a href="{{ url_for('google_auth_start') }}" class="google-btn">
+            <i class="fab fa-google"></i> Continue with Google
+        </a>
+        {% endif %}
+        
+        <!-- Back to Home -->
+        <div class="links">
+            <p><a href="{{ url_for('home') }}"><i class="fa-solid fa-arrow-left"></i> Back to Home</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+/* ===== FIX GLOBAL SCROLL ===== */
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* ===== FORM CONTAINER ===== */
+.form-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+    padding: 0 15px;
+    margin: 0;
+    overflow: hidden;
+}
+
+.form-box {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 400px;
+    max-height: 95vh; /* Increased to accommodate more fields */
+    overflow-y: auto; /* Changed to auto for scrolling if needed */
+    overflow-x: hidden;
+}
+
+/* ===== TYPOGRAPHY ===== */
+h2 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 5px;
+    font-size: 28px;
+}
+
+.welcome-text {
+    text-align: center;
+    color: #7f8c8d;
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+.admin-info {
+    background: linear-gradient(135deg, #fef9e7, #fcf3cf);
+    border: 1px solid #f7dc6f;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    text-align: center;
+    color: #d35400;
+    font-size: 13px;
+}
+
+.admin-info i {
+    margin-right: 8px;
+    color: #f39c12;
+}
+
+/* ===== INPUT FIELDS ===== */
+.input-field {
+    margin: 12px 0;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid #3498db;
+    padding: 8px 0;
+    transition: 0.3s;
+    position: relative;
+    width: 100%;
+    min-height: 45px;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.input-field:focus-within {
+    border-color: #2ecc71;
+    box-shadow: 0 2px 0 #2ecc71;
+}
+
+.input-field i {
+    margin-right: 12px;
+    color: #3498db;
+    font-size: 18px;
+    width: 20px;
+    flex-shrink: 0;
+    line-height: 1;
+}
+
+.input-field input {
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 8px 40px 8px 0;
+    font-size: 16px;
+    background: transparent;
+    flex: 1;
+}
+
+.input-field input::placeholder {
+    color: #95a5a6;
+    opacity: 0.8;
+}
+
+/* ===== PASSWORD FIELD ===== */
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: stretch;
+}
+
+.password-field input {
+    padding-right: 40px !important;
+    letter-spacing: 0.5px;
+    flex: 1;
+}
+
+/* EYE BUTTON */
+.toggle-password {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #7f8c8d;
+    cursor: pointer;
+    width: 40px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    padding: 0;
+}
+
+.toggle-password:hover {
+    color: #3498db;
+    background: rgba(52, 152, 219, 0.05);
+}
+
+.toggle-password:active {
+    background: rgba(52, 152, 219, 0.1);
+}
+
+.toggle-password i {
+    font-size: 18px;
+    pointer-events: none;
+}
+
+.password-field::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    width: 40px;
+    background: transparent;
+    pointer-events: none;
+}
+
+/* ===== BUTTONS ===== */
+.dual-buttons {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0 10px 0;
+    transition: all 0.3s ease;
+}
+
+.btn-login, .btn-register {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 45px;
+}
+
+.btn-login {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+}
+
+.btn-register {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+}
+
+.btn-login:hover:not(:disabled) {
+    background: linear-gradient(135deg, #27ae60, #219653);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(46, 204, 113, 0.3);
+}
+
+.btn-register:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2980b9, #1f618d);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+}
+
+.btn-login:disabled, .btn-register:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* ===== DIVIDER ===== */
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 8px 0 12px 0;
+    color: #95a5a6;
+    font-size: 14px;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+
+.divider span {
+    padding: 0 12px;
+}
+
+/* ===== GOOGLE BUTTON ===== */
+.google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    background: white;
+    color: #333;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    margin-bottom: 15px;
+    min-height: 45px;
+}
+
+.google-btn:hover {
+    background: #f8f9fa;
+    border-color: #c6c6c6;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+}
+
+/* ===== LINKS ===== */
+.links {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.links a {
+    color: #3498db;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.links a:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+/* ===== ALERTS ===== */
+.alert {
+    padding: 10px 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid transparent;
+    font-size: 14px;
+}
+
+.alert-success {
+    background: rgba(46, 204, 113, 0.1);
+    border-color: rgba(46, 204, 113, 0.2);
+    color: #27ae60;
+}
+
+.alert-danger {
+    background: rgba(231, 76, 60, 0.1);
+    border-color: rgba(231, 76, 60, 0.2);
+    color: #c0392b;
+}
+
+.alert-warning {
+    background: rgba(241, 196, 15, 0.1);
+    border-color: rgba(241, 196, 15, 0.2);
+    color: #f39c12;
+}
+
+.alert-info {
+    background: rgba(52, 152, 219, 0.1);
+    border-color: rgba(52, 152, 219, 0.2);
+    color: #2980b9;
+}
+
+/* ===== VALIDATION STYLES ===== */
+.valid-email {
+    color: #27ae60;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.invalid-email {
+    color: #e74c3c;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.email-exists {
+    color: #f39c12;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+.email-exists a {
+    color: #3498db;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* ===== PASSWORD REQUIREMENTS BOX ===== */
+#password-requirements {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin: 8px 0 5px 0;
+    font-size: 13px;
+    transition: all 0.3s;
+}
+
+#password-requirements strong {
+    color: #495057;
+    font-size: 13px;
+}
+
+#password-requirements ul {
+    margin: 6px 0 0 0;
+    padding-left: 20px;
+}
+
+/* ===== REGISTRATION MODE SPECIFIC STYLES ===== */
+/* Smooth transitions for showing/hiding fields */
+.input-field[style*="display: none"] {
+    max-height: 0;
+    margin: 0;
+    padding: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    overflow: hidden;
+}
+
+.dual-buttons[style*="display: none"] {
+    max-height: 0;
+    margin: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+#back-to-signin[style*="display: none"] {
+    max-height: 0;
+    margin: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
+/* Hide backend flash messages when form validation is active */
+.flash-messages.hidden {
+    display: none;
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+/* ===== RESPONSIVE ADDITIONS FOR LOGIN FORM ===== */
+
+/* Large screens (1200px and above) */
+@media (min-width: 1200px) {
+    .form-container {
+        padding: 0 20px;
+    }
+    .form-box {
+        padding: 35px;
+        max-width: 420px;
+        max-height: 95vh;
+    }
+}
+
+/* Tablets (768px to 991px) */
+@media (max-width: 991px) {
+    .form-container {
+        height: calc(100vh - 60px);
+    }
+    .form-box {
+        padding: 25px;
+        max-width: 380px;
+        max-height: 90vh;
+    }
+    h2 {
+        font-size: 26px;
+    }
+    .welcome-text {
+        font-size: 15px;
+    }
+    .dual-buttons {
+        gap: 12px;
+    }
+    .btn-login, .btn-register {
+        padding: 11px;
+        font-size: 15px;
+        min-height: 44px;
+    }
+}
+
+/* Small tablets (600px to 767px) */
+@media (max-width: 767px) {
+    .form-container {
+        padding: 15px;
+    }
+    .form-box {
+        padding: 22px;
+        max-width: 350px;
+        max-height: 90vh;
+    }
+    .dual-buttons {
+        flex-direction: row;
+    }
+    .btn-login, .btn-register {
+        padding: 11px;
+        font-size: 15px;
+        min-height: 44px;
+    }
+    .input-field {
+        margin: 10px 0;
+        min-height: 42px;
+    }
+}
+
+/* Mobile phones (480px to 599px) */
+@media (max-width: 599px) {
+    .form-container {
+        padding: 12px;
+        height: calc(100vh - 50px);
+    }
+    .form-box {
+        padding: 20px;
+        max-width: 320px;
+        max-height: 90vh;
+    }
+    h2 {
+        font-size: 24px;
+    }
+    .welcome-text {
+        font-size: 14px;
+    }
+    .admin-info {
+        padding: 8px;
+        font-size: 12px;
+    }
+    .dual-buttons {
+        flex-direction: column;
+        gap: 8px;
+        margin: 15px 0 8px 0;
+    }
+    .btn-login, .btn-register {
+        width: 100%;
+        padding: 12px;
+        min-height: 45px;
+    }
+    .input-field {
+        margin: 10px 0;
+        min-height: 42px;
+    }
+    .input-field input {
+        font-size: 15px;
+    }
+    .google-btn {
+        padding: 11px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+    .divider {
+        font-size: 13px;
+    }
+}
+
+/* Small mobile phones (below 480px) */
+@media (max-width: 480px) {
+    .form-container {
+        padding: 10px;
+        height: calc(100vh - 40px);
+    }
+    .form-box {
+        padding: 18px 15px;
+        max-width: 95%;
+        max-height: 90vh;
+    }
+    h2 {
+        font-size: 22px;
+    }
+    .welcome-text {
+        font-size: 13px;
+        margin-bottom: 15px;
+    }
+    .admin-info {
+        padding: 6px;
+        font-size: 11px;
+        margin-bottom: 12px;
+    }
+    .input-field {
+        margin: 8px 0;
+        min-height: 40px;
+    }
+    .input-field input {
+        padding: 8px 35px 8px 0;
+        font-size: 14px;
+    }
+    .toggle-password {
+        width: 35px;
+    }
+    .toggle-password i {
+        font-size: 16px;
+    }
+    .btn-login, .btn-register {
+        padding: 11px;
+        font-size: 14px;
+        min-height: 44px;
+    }
+    .google-btn {
+        padding: 11px;
+        font-size: 14px;
+        margin-bottom: 12px;
+        min-height: 44px;
+    }
+    .divider {
+        margin: 6px 0 10px 0;
+        font-size: 12px;
+    }
+    .links a {
+        font-size: 13px;
+    }
+    .alert {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+}
+
+/* Very small mobile phones (below 360px) */
+@media (max-width: 360px) {
+    .form-box {
+        padding: 16px 12px;
+        max-height: 90vh;
+    }
+    h2 {
+        font-size: 20px;
+    }
+    .welcome-text {
+        font-size: 12px;
+    }
+    .input-field {
+        min-height: 38px;
+    }
+    .input-field input {
+        font-size: 13px;
+    }
+    .btn-login, .btn-register {
+        padding: 10px;
+        font-size: 13px;
+        min-height: 42px;
+    }
+    .google-btn {
+        padding: 10px;
+        font-size: 13px;
+        min-height: 42px;
+    }
+    .divider {
+        font-size: 11px;
+    }
+}
+
+/* Landscape mode for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .form-container {
+        align-items: flex-start;
+        padding-top: 20px;
+        height: auto;
+        min-height: 100vh;
+    }
+    .form-box {
+        max-height: 85vh;
+        overflow-y: auto;
+        margin: 10px 0;
+    }
+    .input-field {
+        margin: 8px 0;
+        min-height: 38px;
+    }
+    .btn-login, .btn-register {
+        padding: 10px;
+        min-height: 40px;
+    }
+    .google-btn {
+        padding: 10px;
+        min-height: 40px;
+    }
+}
+
+/* ===== SMOOTH ANIMATIONS ===== */
+.input-field, .dual-buttons, #back-to-signin, #password-requirements {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+/* Add to your existing CSS */
+.dual-buttons {
+    position: relative;
+    z-index: 20;
+    margin-top: 20px;
+}
+
+#register-mode-buttons {
+    display: none; /* Hidden by default */
+}
+
+#create-account-btn {
+    width: 100% !important;
+    min-height: 45px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.input-group {
+    position: relative;
+    z-index: 10;
+}
+</style>
+
+<script>
+// ===== GLOBAL VARIABLES =====
+let currentMode = 'signin'; // 'signin' or 'register'
+
+// ===== INITIALIZATION =====
+document.addEventListener('DOMContentLoaded', function() {
+    const emailField = document.getElementById('email');
+    if (emailField) {
+        emailField.focus();
+    }
+    
+    initializeForm();
+    
+    // Auto-hide backend flash messages when form validation starts
+    setTimeout(function() {
+        const emailStatus = document.getElementById('email-status');
+        if (emailStatus && emailStatus.style.display !== 'none') {
+            hideBackendFlashMessages();
+        }
+    }, 100);
+});
+
+// ===== FLASH MESSAGES MANAGEMENT =====
+function hideBackendFlashMessages() {
+    const flashMessages = document.getElementById('backend-flash-messages');
+    if (flashMessages) {
+        flashMessages.classList.add('hidden');
+    }
+}
+
+function showBackendFlashMessages() {
+    const flashMessages = document.getElementById('backend-flash-messages');
+    if (flashMessages) {
+        flashMessages.classList.remove('hidden');
+    }
+}
+
+// Auto-hide flash messages after 5 seconds
+setTimeout(function() {
+    document.querySelectorAll('.alert').forEach(function(alert) {
+        alert.style.transition = 'opacity 0.5s ease';
+        alert.style.opacity = '0';
+        setTimeout(function() {
+            if (alert.parentNode) {
+                alert.parentNode.removeChild(alert);
+            }
+        }, 500);
+    });
+}, 5000);
+
+// ===== FORM MODE MANAGEMENT =====
+function switchToRegistrationMode() {
+    currentMode = 'register';
+    
+    // Hide backend flash messages when showing registration form
+    hideBackendFlashMessages();
+    
+    // Show registration fields with smooth animation
+    setTimeout(() => {
+        document.getElementById('first-name-field').style.display = 'flex';
+        document.getElementById('last-name-field').style.display = 'flex';
+        document.getElementById('confirm-password-field').style.display = 'flex';
+        document.getElementById('password-requirements').style.display = 'block';
+        document.getElementById('req-match').style.display = 'list-item';
+        
+        // Switch button modes
+        document.getElementById('signin-mode-buttons').style.display = 'none';
+        document.getElementById('register-mode-buttons').style.display = 'flex';
+        
+        // Show Back to Sign In link
+        document.getElementById('back-to-signin').style.display = 'block';
+        
+        // Update placeholders
+        document.getElementById('password').placeholder = 'Password (min 8 characters)';
+        
+        // Focus on first name
+        setTimeout(() => {
+            document.getElementById('first_name').focus();
+        }, 300);
+        
+        // Validate registration form
+        validateRegistrationForm();
+    }, 50);
+}
+
+function switchToSignInMode() {
+    currentMode = 'signin';
+    
+    // Show backend flash messages again
+    showBackendFlashMessages();
+    
+    // Hide registration fields with smooth animation
+    document.getElementById('first-name-field').style.display = 'none';
+    document.getElementById('last-name-field').style.display = 'none';
+    document.getElementById('confirm-password-field').style.display = 'none';
+    document.getElementById('password-requirements').style.display = 'none';
+    document.getElementById('req-match').style.display = 'none';
+    
+    // Switch button modes
+    document.getElementById('signin-mode-buttons').style.display = 'flex';
+    document.getElementById('register-mode-buttons').style.display = 'none';
+    
+    // Hide Back to Sign In link
+    document.getElementById('back-to-signin').style.display = 'none';
+    
+    // Update placeholders
+    document.getElementById('password').placeholder = 'Password ••••••••';
+    
+    // Focus on email
+    setTimeout(() => {
+        document.getElementById('email').focus();
+    }, 300);
+    
+    // Clear name fields
+    document.getElementById('first_name').value = '';
+    document.getElementById('last_name').value = '';
+    document.getElementById('confirm_password').value = '';
+}
+
+// ===== EMAIL DOMAIN VALIDATION =====
+function isValidEmailDomain(email) {
+    if (!email || !isValidEmail(email)) return false;
+    
+    const domain = email.split('@')[1];
+    if (!domain) return false;
+    
+    // Common invalid/test domains
+    const invalidDomains = [
+        'example.com', 'test.com', 'domain.com', 'email.com',
+        'mail.com', 'test.org', 'example.org', 'fake.com',
+        'dummy.com', 'placeholder.com', 'testmail.com'
+    ];
+    
+    // Check domain parts
+    const domainParts = domain.split('.');
+    if (domainParts.length < 2) return false;
+    
+    // Check TLD length
+    const tld = domainParts[domainParts.length - 1];
+    if (tld.length < 2 || tld.length > 6) return false;
+    
+    // Check against invalid domains
+    if (invalidDomains.includes(domain.toLowerCase())) {
+        return false;
+    }
+    
+    return true;
+}
+
+// ===== ENHANCED EMAIL VALIDATION =====
+function checkEmailExists() {
+    const email = document.getElementById('email').value.trim();
+    const emailStatus = document.getElementById('email-status');
+    
+    if (!email || !isValidEmail(email)) {
+        emailStatus.style.display = 'none';
+        if (currentMode === 'register') {
+            document.getElementById('create-account-btn').disabled = true;
+        }
+        return;
+    }
+    
+    // Hide backend flash messages when checking email
+    hideBackendFlashMessages();
+    
+    // Domain validation for registration mode
+    if (currentMode === 'register') {
+        if (!isValidEmailDomain(email)) {
+            emailStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Please use a valid email domain (e.g., gmail.com, outlook.com)';
+            emailStatus.className = 'alert-warning';
+            emailStatus.style.display = 'block';
+            document.getElementById('create-account-btn').disabled = true;
+            return;
+        }
+    }
+    
+    // Show checking status
+    emailStatus.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking email...';
+    emailStatus.style.display = 'block';
+    emailStatus.className = 'alert-info';
+    
+    // Send AJAX request to check email
+    fetch('/check-email', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.exists) {
+            emailStatus.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Email already registered. <a href="#" onclick="switchToSignInMode()">Sign in instead</a>';
+            emailStatus.className = 'email-exists';
+            
+            if (currentMode === 'register') {
+                document.getElementById('create-account-btn').disabled = true;
+            } else {
+                document.getElementById('join-btn').disabled = true;
+            }
+        } else {
+            emailStatus.innerHTML = '<i class="fas fa-check-circle"></i> Email available';
+            emailStatus.className = 'valid-email';
+            
+            if (currentMode === 'register') {
+                validateRegistrationForm();
+            } else {
+                document.getElementById('join-btn').disabled = false;
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error checking email:', error);
+        emailStatus.style.display = 'none';
+        if (currentMode === 'register') {
+            validateRegistrationForm();
+        }
+    });
+}
+
+// ===== REGISTRATION FORM VALIDATION =====
+function validateRegistrationForm() {
+    const firstName = document.getElementById('first_name').value.trim();
+    const lastName = document.getElementById('last_name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    const createAccountBtn = document.getElementById('create-account-btn');
+    
+    // Check all requirements
+    const hasFirstName = firstName.length > 0;
+    const hasLastName = lastName.length > 0;
+    const hasValidEmail = isValidEmail(email) && isValidEmailDomain(email);
+    const hasLength = password.length >= 8;
+    const hasUppercase = /[A-Z]/.test(password);
+    const hasLowercase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const passwordsMatch = password === confirmPassword && confirmPassword !== '';
+    
+    // Update requirement indicators
+    updateRequirement('req-length', hasLength);
+    updateRequirement('req-uppercase', hasUppercase);
+    updateRequirement('req-lowercase', hasLowercase);
+    updateRequirement('req-number', hasNumber);
+    updateRequirement('req-match', passwordsMatch);
+    
+    // Enable/disable Create Account button
+    const isFormValid = hasFirstName && hasLastName && hasValidEmail && 
+                       hasLength && hasUppercase && hasLowercase && 
+                       hasNumber && passwordsMatch;
+    
+    createAccountBtn.disabled = !isFormValid;
+    return isFormValid;
+}
+
+// ===== FORM SUBMISSION HANDLING =====
+document.getElementById('authForm').addEventListener('submit', function(e) {
+    // Get the hidden action field
+    const actionField = document.getElementById('form-action');
+    
+    if (currentMode === 'register') {
+        // Set action to 'join' for registration
+        actionField.value = 'join';
+        
+        // Validate registration form
+        if (!validateRegistrationForm()) {
+            e.preventDefault();
+            alert('Please fill all required fields correctly');
+            return false;
+        }
+        
+        // Additional email domain validation
+        const email = document.getElementById('email').value.trim();
+        if (!isValidEmailDomain(email)) {
+            e.preventDefault();
+            alert('Please use a valid email domain (e.g., gmail.com, outlook.com)');
+            document.getElementById('email').focus();
+            return false;
+        }
+        
+        // Allow form to submit naturally
+        return true;
+    } else {
+        // Set action to 'signin' for login
+        actionField.value = 'signin';
+        // Allow form to submit naturally
+        return true;
+    }
+});
+// ===== ORIGINAL FUNCTIONS (UNCHANGED) =====
+function initializeForm() {
+    checkPasswordStrength();
+    setupFormValidation();
+    
+    // Add event listeners for registration fields
+    document.getElementById('first_name').addEventListener('input', validateRegistrationForm);
+    document.getElementById('last_name').addEventListener('input', validateRegistrationForm);
+    document.getElementById('password').addEventListener('input', checkPasswordStrength);
+    document.getElementById('confirm_password').addEventListener('input', checkPasswordStrength);
+    document.getElementById('email').addEventListener('input', function() {
+        checkEmailExists();
+        if (currentMode === 'register') {
+            validateRegistrationForm();
+        }
+    });
+}
+
+function togglePassword(fieldId) {
+    const field = document.getElementById(fieldId);
+    const toggleBtn = field.parentElement.querySelector('.toggle-password i');
+    const toggleButton = field.parentElement.querySelector('.toggle-password');
+    
+    if (field.type === 'password') {
+        field.type = 'text';
+        toggleBtn.className = 'fa-solid fa-eye-slash';
+        toggleButton.title = 'Hide password';
+        field.placeholder = field.placeholder.replace('••••••••', 'Visible');
+    } else {
+        field.type = 'password';
+        toggleBtn.className = 'fa-solid fa-eye';
+        toggleButton.title = 'Show password';
+        field.placeholder = field.placeholder.replace('Visible', '••••••••');
+    }
+    
+    setTimeout(() => field.focus(), 10);
+}
+
+function checkPasswordStrength() {
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm_password').value;
+    const passwordRequirements = document.getElementById('password-requirements');
+    
+    if (currentMode === 'register') {
+        passwordRequirements.style.display = 'block';
+        
+        const hasLength = password.length >= 8;
+        const hasUppercase = /[A-Z]/.test(password);
+        const hasLowercase = /[a-z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const passwordsMatch = password === confirmPassword && confirmPassword !== '';
+        
+        updateRequirement('req-length', hasLength);
+        updateRequirement('req-uppercase', hasUppercase);
+        updateRequirement('req-lowercase', hasLowercase);
+        updateRequirement('req-number', hasNumber);
+        updateRequirement('req-match', passwordsMatch);
+        
+        validateRegistrationForm();
+    } else {
+        passwordRequirements.style.display = 'none';
+    }
+}
+
+function updateRequirement(elementId, isValid) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        const text = element.textContent.substring(2);
+        if (isValid) {
+            element.innerHTML = '✓ ' + text;
+            element.style.color = '#27ae60';
+        } else {
+            element.innerHTML = '✗ ' + text;
+            element.style.color = '#e74c3c';
+        }
+    }
+}
+
+function isValidEmail(email) {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+function setupFormValidation() {
+    const passwordField = document.getElementById('password');
+    const confirmField = document.getElementById('confirm_password');
+    const emailField = document.getElementById('email');
+    
+    passwordField.addEventListener('input', checkPasswordStrength);
+    confirmField.addEventListener('input', checkPasswordStrength);
+    emailField.addEventListener('blur', checkEmailExists);
+}
+
+// ===== BACKWARD COMPATIBILITY FUNCTIONS =====
+// These keep your original functionality working
+let currentAction = 'signin';
+
+document.getElementById('signin-btn').addEventListener('click', function() {
+    currentAction = 'signin';
+});
+
+// Original validateJoinForm modified to switch to registration mode
+function validateJoinForm() {
+    switchToRegistrationMode();
+    return false;
+}
+
+// Original switchToSignIn function
+function switchToSignIn() {
+    switchToSignInMode();
+}
+</script>
+{% endblock %}

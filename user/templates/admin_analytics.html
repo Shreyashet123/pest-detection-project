@@ -1,0 +1,748 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<style>
+    .analytics-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+        color: white;
+    }
+    
+    .analytics-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 40px;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(76, 175, 80, 0.3));
+        border-radius: 20px;
+        border-left: 8px solid #2196F3;
+    }
+    
+    .analytics-header h1 {
+        font-size: 2.8em;
+        margin-bottom: 15px;
+        color: #4CAF50;
+    }
+    
+    .analytics-header p {
+        font-size: 1.3em;
+        opacity: 0.9;
+    }
+    
+    .analytics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+    }
+    
+    .analytics-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 30px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: transform 0.3s;
+    }
+    
+    .analytics-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .card-icon {
+        width: 50px;
+        height: 50px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5em;
+        color: #4CAF50;
+    }
+    
+    .card-title h3 {
+        margin: 0;
+        color: white;
+        font-size: 1.3em;
+    }
+    
+    .card-title p {
+        margin: 5px 0 0 0;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.9em;
+    }
+    
+    .card-value {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: white;
+        margin-bottom: 10px;
+    }
+    
+    .card-progress {
+        height: 8px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-top: 15px;
+    }
+    
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, #4CAF50, #2196F3);
+        border-radius: 4px;
+    }
+    
+    .charts-section {
+        margin-bottom: 40px;
+    }
+    
+    .charts-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-top: 20px;
+    }
+    
+    @media (max-width: 992px) {
+        .charts-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .chart-container {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 25px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .chart-title {
+        color: #4CAF50;
+        margin-bottom: 20px;
+        font-size: 1.3em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .chart-wrapper {
+        height: 300px;
+        position: relative;
+    }
+    
+    .weekly-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    
+    .weekly-table th {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px;
+        text-align: left;
+        color: #4CAF50;
+        font-weight: 600;
+    }
+    
+    .weekly-table td {
+        padding: 15px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .weekly-table tr:hover {
+        background: rgba(255, 255, 255, 0.03);
+    }
+    
+    .upload-count {
+        color: #4CAF50;
+        font-weight: 600;
+    }
+    
+    .query-count {
+        color: #2196F3;
+        font-weight: 600;
+    }
+    
+    .trend-up {
+        color: #4CAF50;
+    }
+    
+    .trend-down {
+        color: #f44336;
+    }
+    
+    .trend-neutral {
+        color: #FF9800;
+    }
+    
+    .pest-list {
+        margin-top: 20px;
+    }
+    
+    .pest-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        margin-bottom: 8px;
+        transition: background 0.3s;
+    }
+    
+    .pest-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .pest-name {
+        font-weight: 500;
+    }
+    
+    .pest-count {
+        background: rgba(76, 175, 80, 0.2);
+        color: #4CAF50;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.9em;
+        font-weight: 500;
+    }
+    
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: rgba(255, 255, 255, 0.5);
+        font-style: italic;
+    }
+    
+    .refresh-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 1000;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    
+    .last-updated {
+        text-align: right;
+        color: rgba(255, 255, 255, 0.5);
+        font-size: 0.9em;
+        margin-top: 10px;
+    }
+    
+    .stats-highlight {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        font-size: 0.9em;
+    }
+    
+    .stats-highlight .trend-up,
+    .stats-highlight .trend-down,
+    .stats-highlight .trend-neutral {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+</style>
+
+<div class="analytics-container">
+    <!-- Header -->
+    <div class="analytics-header">
+        <h1><i class="fas fa-chart-bar"></i> System Analytics Dashboard</h1>
+        <p>Real-time insights and statistics from your pest detection system</p>
+        <div class="last-updated">
+           <i class="fas fa-clock"></i> Last updated: {{ current_time.strftime('%Y-%m-%d %H:%M:%S') }}
+        </div>
+    </div>
+    
+    <!-- Key Metrics -->
+    <div class="analytics-grid">
+        <div class="analytics-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-bullseye"></i>
+                </div>
+                <div class="card-title">
+                    <h3>Detection Accuracy</h3>
+                    <p>Based on confirmed pest identifications</p>
+                </div>
+            </div>
+            <div class="card-value">{{ accuracy_rate }}%</div>
+            <div class="card-progress">
+                <div class="progress-bar" style="width: {{ accuracy_rate }}%"></div>
+            </div>
+            <div class="stats-highlight">
+                <span>
+                    <i class="fas fa-check-circle" style="color: #4CAF50;"></i>
+                    {{ ((accuracy_rate / 100) * total_users * 10)|int }} successful detections
+                </span>
+            </div>
+        </div>
+        
+        <div class="analytics-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="card-title">
+                    <h3>Active Users</h3>
+                    <p>Active in last 7 days</p>
+                </div>
+            </div>
+            <div class="card-value">{{ active_users }}/{{ total_users }}</div>
+            <div class="card-progress">
+                <div class="progress-bar" style="width: {{ (active_users/total_users*100) if total_users > 0 else 0 }}%"></div>
+            </div>
+            <div class="stats-highlight">
+                {% set activity_percentage = (active_users/total_users*100) if total_users > 0 else 0 %}
+                {% if activity_percentage > 70 %}
+                <span class="trend-up">
+                    <i class="fas fa-arrow-up"></i> High engagement
+                </span>
+                {% elif activity_percentage > 30 %}
+                <span class="trend-neutral">
+                    <i class="fas fa-minus"></i> Moderate engagement
+                </span>
+                {% else %}
+                <span class="trend-down">
+                    <i class="fas fa-arrow-down"></i> Low engagement
+                </span>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="analytics-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="card-title">
+                    <h3>Weekly Growth</h3>
+                    <p>Increase in system usage</p>
+                </div>
+            </div>
+            <div class="card-value">{{ weekly_growth }}%</div>
+            <div class="stats-highlight">
+                {% if weekly_growth > 0 %}
+                <span class="trend-up">
+                    <i class="fas fa-arrow-up"></i> Positive growth
+                </span>
+                {% elif weekly_growth < 0 %}
+                <span class="trend-down">
+                    <i class="fas fa-arrow-down"></i> Negative growth
+                </span>
+                {% else %}
+                <span class="trend-neutral">
+                    <i class="fas fa-minus"></i> Stable
+                </span>
+                {% endif %}
+                <span>
+                    {{ weekly_data[-1].uploads if weekly_data else 0 }} today
+                </span>
+            </div>
+        </div>
+        
+        <div class="analytics-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-database"></i>
+                </div>
+                <div class="card-title">
+                    <h3>Total Data</h3>
+                    <p>Images & Queries processed</p>
+                </div>
+            </div>
+            <div class="card-value">
+                {% set total_uploads = weekly_data|sum(attribute='uploads') if weekly_data else 0 %}
+                {% set total_queries = weekly_data|sum(attribute='queries') if weekly_data else 0 %}
+                {{ total_uploads + total_queries }}
+            </div>
+            <div class="stats-highlight">
+                <span>
+                    <i class="fas fa-image" style="color: #4CAF50;"></i>
+                    {{ total_uploads }} uploads
+                </span>
+                <span>
+                    <i class="fas fa-search" style="color: #2196F3;"></i>
+                    {{ total_queries }} queries
+                </span>
+            </div>
+        </div>
+        
+        <div class="analytics-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-bug"></i>
+                </div>
+                <div class="card-title">
+                    <h3>Pest Detections</h3>
+                    <p>Total pests identified</p>
+                </div>
+            </div>
+            <div class="card-value">
+                {{ top_pests_counts|sum if top_pests_counts else 0 }}
+            </div>
+            <div class="stats-highlight">
+                <span>
+                    <i class="fas fa-list" style="color: #FF9800;"></i>
+                    {{ top_pests_labels|length if top_pests_labels else 0 }} pest types
+                </span>
+            </div>
+        </div>
+        
+        <div class="analytics-card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-server"></i>
+                </div>
+                <div class="card-title">
+                    <h3>System Status</h3>
+                    <p>Database & API Health</p>
+                </div>
+            </div>
+            {% set has_data = weekly_data and len(weekly_data) > 0 %}
+            <div class="card-value" style="color: {% if has_data %}#4CAF50{% else %}#FF9800{% endif %};">
+                {% if has_data %}Operational{% else %}No Data{% endif %}
+            </div>
+            <div class="stats-highlight">
+                {% if has_data %}
+                <span class="trend-up">
+                    <i class="fas fa-check-circle"></i> All systems OK
+                </span>
+                {% else %}
+                <span class="trend-neutral">
+                    <i class="fas fa-exclamation-triangle"></i> Collecting data
+                </span>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- Charts Section -->
+    <div class="charts-section">
+        <h2 class="chart-title"><i class="fas fa-chart-area"></i> Activity Charts</h2>
+        <div class="charts-grid">
+            <div class="chart-container">
+                <h3 class="chart-title"><i class="fas fa-chart-line"></i> Weekly Activity Trend</h3>
+                <div class="chart-wrapper">
+                    <canvas id="weeklyActivityChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-container">
+                <h3 class="chart-title"><i class="fas fa-chart-pie"></i> Pest Distribution</h3>
+                <div class="chart-wrapper">
+                    <canvas id="pestDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+  
+    <!-- Weekly Activity Table -->
+<div class="chart-container">
+    <h2 class="chart-title"><i class="fas fa-calendar-week"></i> Last 7 Days Activity</h2>
+    {% if weekly_data and weekly_data|length > 0 %}
+    <table class="weekly-table">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Date</th>
+                <th>Uploads</th>
+                <th>Queries</th>
+                <th>Total</th>
+                <th>Trend</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for day_data in weekly_data %}
+            {% set day_date = (datetime.now() - timedelta(days=loop.revindex0)).strftime('%Y-%m-%d') %}
+            <tr>
+                <td><strong>{{ day_data.day }}</strong></td>
+                <td>{{ day_date }}</td>
+                <td><span class="upload-count">{{ day_data.uploads }}</span></td>
+                <td><span class="query-count">{{ day_data.queries }}</span></td>
+                <td><strong>{{ day_data.uploads + day_data.queries }}</strong></td>
+                <td>
+                    {% if loop.index0 > 0 %}
+                        {% set prev_uploads = weekly_data[loop.index0-1].uploads %}
+                        {% set trend = day_data.uploads - prev_uploads %}
+                        {% if trend > 0 %}
+                            <span class="trend-up"><i class="fas fa-arrow-up"></i> +{{ trend }}</span>
+                        {% elif trend < 0 %}
+                            <span class="trend-down"><i class="fas fa-arrow-down"></i> {{ trend }}</span>
+                        {% else %}
+                            <span class="trend-neutral"><i class="fas fa-minus"></i> 0</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="trend-neutral"><i class="fas fa-minus"></i> -</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+            <!-- Total Row -->
+            <tr style="background: rgba(255, 255, 255, 0.05);">
+                <td colspan="2"><strong>Total</strong></td>
+                <td><strong class="upload-count">{{ weekly_data|sum(attribute='uploads') }}</strong></td>
+                <td><strong class="query-count">{{ weekly_data|sum(attribute='queries') }}</strong></td>
+                <td><strong>{{ (weekly_data|sum(attribute='uploads') + weekly_data|sum(attribute='queries')) }}</strong></td>
+                <td>
+                    {% if weekly_data|length > 1 %}
+                        {% set first_day = weekly_data[0].uploads %}
+                        {% set last_day = weekly_data[-1].uploads %}
+                        {% set weekly_trend = ((last_day - first_day) / first_day * 100) if first_day > 0 else 0 %}
+                        {% if weekly_trend > 0 %}
+                            <span class="trend-up"><i class="fas fa-arrow-up"></i> {{ "%.1f"|format(weekly_trend) }}%</span>
+                        {% elif weekly_trend < 0 %}
+                            <span class="trend-down"><i class="fas fa-arrow-down"></i> {{ "%.1f"|format(weekly_trend) }}%</span>
+                        {% else %}
+                            <span class="trend-neutral"><i class="fas fa-minus"></i> 0%</span>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    {% else %}
+    <div class="no-data">
+        <i class="fas fa-chart-bar fa-3x"></i>
+        <p>No activity data available for the last 7 days</p>
+        <p style="font-size: 0.9em; margin-top: 10px;">Data will appear as users start using the system</p>
+    </div>
+    {% endif %}
+</div>
+    
+    <!-- Top Detected Pests -->
+    <div class="chart-container" style="margin-top: 25px;">
+        <h2 class="chart-title"><i class="fas fa-bug"></i> Top Detected Pests</h2>
+        {% if top_pests_labels and top_pests_counts and top_pests_labels|length > 0 %}
+        <div class="pest-list">
+            {% for pest_label, pest_count in zip(top_pests_labels, top_pests_counts) %}
+            <div class="pest-item">
+                <span class="pest-name">
+                    <i class="fas fa-bug" style="color: #4CAF50; margin-right: 8px;"></i>
+                    {{ pest_label }}
+                </span>
+                <span class="pest-count">{{ pest_count }} detections</span>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-data">
+            <i class="fas fa-bug fa-3x"></i>
+            <p>No pest detection data available yet</p>
+            <p style="font-size: 0.9em; margin-top: 10px;">Pest data will appear after users upload images</p>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- System Performance -->
+    <div class="chart-container" style="margin-top: 25px;">
+        <h2 class="chart-title"><i class="fas fa-tachometer-alt"></i> System Performance</h2>
+        <div class="charts-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-top: 0;">
+            <div style="text-align: center;">
+                <div style="font-size: 2.5em; font-weight: bold; color: #4CAF50;">{{ accuracy_rate }}%</div>
+                <div style="color: rgba(255, 255, 255, 0.7);">Detection Accuracy</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 2.5em; font-weight: bold; color: #2196F3;">
+                    {{ "%.1f"|format((weekly_data|sum(attribute='uploads') / 7) if weekly_data and weekly_data|length > 0 else 0) }}
+                </div>
+                <div style="color: rgba(255, 255, 255, 0.7);">Avg Daily Uploads</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="font-size: 2.5em; font-weight: bold; color: #FF9800;">
+                    {{ "%.1f"|format((active_users / total_users * 100) if total_users > 0 else 0) }}%
+                </div>
+                <div style="color: rgba(255, 255, 255, 0.7);">User Engagement</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Chart.js library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+// Initialize charts when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Weekly Activity Chart
+    const weeklyCtx = document.getElementById('weeklyActivityChart').getContext('2d');
+    
+    // Get data from backend
+    const weeklyLabels = {{ weekly_data|map(attribute='day')|list|tojson }};
+    const uploadData = {{ weekly_data|map(attribute='uploads')|list|tojson }};
+    const queryData = {{ weekly_data|map(attribute='queries')|list|tojson }};
+    
+    const weeklyActivityChart = new Chart(weeklyCtx, {
+        type: 'line',
+        data: {
+            labels: weeklyLabels,
+            datasets: [
+                {
+                    label: 'Image Uploads',
+                    data: uploadData,
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    tension: 0.4,
+                    borderWidth: 2,
+                    fill: true
+                },
+                {
+                    label: 'User Queries',
+                    data: queryData,
+                    borderColor: '#2196F3',
+                    backgroundColor: 'rgba(33, 150, 243, 0.1)',
+                    tension: 0.4,
+                    borderWidth: 2,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'white',
+                        font: {
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    borderColor: '#4CAF50',
+                    borderWidth: 1
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: 'rgba(255, 255, 255, 0.7)'
+                    },
+                    grid: {
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+    
+    // Pest Distribution Chart
+    const pestCtx = document.getElementById('pestDistributionChart').getContext('2d');
+    
+    const pestLabels = {{ top_pests_labels|tojson }};
+    const pestData = {{ top_pests_counts|tojson }};
+    
+    // Generate colors dynamically
+    const pestColors = [
+        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+        '#FF9F40', '#FF6384', '#C9CBCF', '#4BC0C0', '#FF6384'
+    ];
+    
+    const pestDistributionChart = new Chart(pestCtx, {
+        type: 'doughnut',
+        data: {
+            labels: pestLabels,
+            datasets: [{
+                data: pestData,
+                backgroundColor: pestColors.slice(0, pestLabels.length),
+                borderWidth: 1,
+                borderColor: 'rgba(255, 255, 255, 0.1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        color: 'white',
+                        padding: 15
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'white',
+                    bodyColor: 'white',
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((context.parsed / total) * 100);
+                            label += context.parsed + ' (' + percentage + '%)';
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+
+// Manual refresh button
+function refreshAnalytics() {
+    const btn = document.querySelector('.refresh-btn');
+    if (!btn) return;
+    
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+    btn.disabled = true;
+    
+    setTimeout(() => {
+        location.reload();
+    }, 1000);
+}
+
+// Add refresh button
+document.addEventListener('DOMContentLoaded', function() {
+    const refreshBtn = document.createElement('button');
+    refreshBtn.className = 'refresh-btn';
+    refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Analytics';
+    refreshBtn.onclick = refreshAnalytics;
+    document.body.appendChild(refreshBtn);
+});
+
+// Auto refresh every 5 minutes (300000 ms)
+setTimeout(function() {
+    location.reload();
+}, 300000);
+</script>
+{% endblock %}

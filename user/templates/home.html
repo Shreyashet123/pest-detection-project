@@ -1,0 +1,360 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<style>
+/* =========================
+   PREDICT PAGE – REFINED UI
+   ========================= */
+
+.form-signin {
+    max-width: 620px;
+    margin: 40px auto;
+    padding: 32px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.bc-1 {
+    width: 100%;
+}
+
+.card-header-section {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.card-header-section h2 {
+    color: #1b5e20;
+    font-size: 1.9rem;
+    margin: 0 0 12px 0;
+    font-weight: 700;
+}
+
+.card-header-section p {
+    color: #555;
+    font-size: 1.05rem;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* File input */
+.input-wrapper {
+    width: 100%;
+}
+
+#inputfile {
+    padding: 18px;
+    border: 2px dashed #4CAF50;
+    border-radius: 12px;
+    background: #f9fbfa;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-sizing: border-box;
+}
+
+/* Preview Container - Fixed height issues */
+#image-preview-container {
+    margin-top: 10px;
+    text-align: center;
+    padding: 15px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    background: #fafafa;
+    /* Remove fixed max-height to allow natural flow */
+    transition: all 0.3s ease;
+}
+
+#output-image {
+    max-width: 100%;
+    max-height: 300px; /* Limits size without breaking layout */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Submit button */
+button[type="submit"] {
+    width: 100%;
+    padding: 16px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    border-radius: 50px;
+    border: none;
+    color: #ffffff;
+    background: linear-gradient(135deg, #4CAF50, #2E7D32);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+button[type="submit"]:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(76, 175, 80, 0.35);
+}
+
+/* Remove button styling */
+.btn-danger {
+    background-color: #dc3545; /* Strong red */
+    color: #ffffff !important; /* Force white text */
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.2);
+}
+
+.btn-danger i {
+    color: #ffffff;
+}
+/* Tip box */
+.tip-box {
+    background: #f5f9f6;
+    padding: 18px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    color: #444;
+    border-left: 4px solid #4CAF50;
+}
+
+.loading { background: #bdbdbd !important; cursor: not-allowed; }
+/* ===== RESPONSIVE ADDITIONS FOR HOME/LAYOUT ===== */
+
+/* Large screens (1200px and above) */
+@media (min-width: 1200px) {
+    .navbar {
+        width: 80%;
+    }
+    .footer-container {
+        width: 80%;
+    }
+}
+
+/* Tablets (768px to 991px) */
+@media (max-width: 991px) {
+    .navbar ul li {
+        margin: 0 12px;
+    }
+    .navbar ul li a {
+        font-size: 13px;
+    }
+    .hero-center h1 {
+        font-size: 36px;
+    }
+    .hero-center p {
+        font-size: 18px;
+    }
+    .hero-buttons button {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+}
+
+/* Small tablets and large phones (576px to 767px) */
+@media (max-width: 767px) {
+    .navbar {
+        padding: 15px 0;
+    }
+    .logo {
+        width: 100px;
+    }
+    .hero-center {
+        padding-top: 30px;
+    }
+    .hero-center h1 {
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+    .hero-center p {
+        font-size: 16px;
+        margin-bottom: 30px;
+        padding: 0 15px;
+    }
+    .hero-buttons {
+        gap: 12px;
+    }
+    .hero-buttons button {
+        padding: 10px 20px;
+        font-size: 15px;
+    }
+    .footer-section {
+        min-width: 200px;
+    }
+}
+
+/* Mobile phones (480px to 575px) */
+@media (max-width: 575px) {
+    .navbar {
+        width: 90%;
+        padding: 12px 0;
+    }
+    .logo {
+        width: 80px;
+    }
+    .hero-center {
+        padding-top: 25px;
+        min-height: calc(100vh - 100px);
+    }
+    .hero-center h1 {
+        font-size: 28px;
+        margin-bottom: 15px;
+        padding: 0 10px;
+    }
+    .hero-center p {
+        font-size: 14px;
+        margin-bottom: 25px;
+        padding: 0 10px;
+        line-height: 1.5;
+    }
+    .hero-buttons {
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        max-width: 250px;
+    }
+    .hero-buttons button {
+        width: 100%;
+        padding: 12px;
+    }
+    .footer-section {
+        min-width: 100%;
+        padding: 0 5px;
+    }
+    .footer-section h3 {
+        font-size: 16px;
+    }
+    .footer-section p {
+        font-size: 13px;
+    }
+    .footer-bottom {
+        font-size: 11px;
+        padding: 10px 5px;
+    }
+}
+
+/* Small mobile phones (below 480px) */
+@media (max-width: 480px) {
+    .navbar ul li {
+        margin: 0 8px;
+    }
+    .navbar ul li a {
+        font-size: 12px;
+    }
+    .hero-center h1 {
+        font-size: 24px;
+    }
+    .hero-center p {
+        font-size: 13px;
+    }
+    #flash-container {
+        width: 95%;
+        margin: 15px auto;
+    }
+    .flash-message {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+}
+
+/* Landscape mode for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .hero-center {
+        padding-top: 20px;
+        min-height: auto;
+    }
+    .hero-center h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+    }
+    .hero-center p {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    .hero-buttons {
+        flex-direction: row;
+        gap: 10px;
+    }
+    .hero-buttons button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
+
+</style>
+
+<form class="form-signin" action="{{ url_for('make_prediction') }}" method="POST" enctype="multipart/form-data">
+    <div class="card-header-section">
+        <h2><i class="fas fa-bug"></i> {{ lang.get('predict_title') }}</h2>
+        <p>{{ lang.get('predict_subtitle') }}</p>
+    </div>
+
+    <div class="input-wrapper">
+        <input type="file" name="file" id="inputfile" accept="image/*" onchange="preview_image(event)" required>
+    </div>
+
+    <div id="image-preview-container" style="display:none;">
+        <h4 style="margin-bottom:10px;">{{ lang.get('preview') }}</h4>
+        <img id="output-image" alt="Preview">
+        <br>
+        <button type="button" onclick="clearPreview()" class="btn btn-danger">
+            <i class="fas fa-times"></i> {{ lang.get('remove') }}
+        </button>
+    </div>
+
+    <button type="submit" id="predictBtn">
+        <i class="fas fa-search"></i> {{ lang.get('predict_button') }}
+    </button>
+
+    <div class="tip-box">
+        <i class="fas fa-lightbulb" style="color: #FF9800;"></i>
+        <strong>{{ lang.get('predict_tip_strong') }}</strong> {{ lang.get('predict_tip') }}
+    </div>
+</form>
+
+<script>
+// Logic remains same, ensures interface stability
+function preview_image(event) {
+    const reader = new FileReader();
+    reader.onload = function () {
+        const output = document.getElementById('output-image');
+        output.src = reader.result;
+        document.getElementById('image-preview-container').style.display = 'block';
+    };
+    reader.readAsDataURL(event.target.files[0]);
+}
+
+function clearPreview() {
+    document.getElementById('inputfile').value = '';
+    document.getElementById('image-preview-container').style.display = 'none';
+}
+
+document.querySelector('.form-signin').addEventListener('submit', function (e) {
+    const btn = document.getElementById('predictBtn');
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> {{ lang.get("processing") }}';
+    btn.disabled = true;
+    btn.classList.add('loading');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,1673 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<style>
+.pest-management-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    color: white;
+}
+
+.pest-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.pest-header h1 {
+    font-size: 2.5em;
+    color: #4CAF50;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-add-pest {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #4CAF50, #388E3C);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s;
+}
+
+.btn-add-pest:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.pest-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.pest-stat-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    border-radius: 15px;
+    border-left: 4px solid #FF9800;
+    transition: all 0.3s;
+}
+
+.pest-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.pest-stat-card h3 {
+    font-size: 2em;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.pest-stat-card p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95em;
+}
+
+.pests-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+/* CARD */
+.pest-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 400px;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+.pest-card:hover {
+    transform: translateY(-5px);
+    border-color: #4CAF50;
+    box-shadow: 0 10px 25px rgba(76, 175, 80, 0.2);
+}
+
+.pest-card-image {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.pest-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.pest-card:hover .pest-card-image img {
+    transform: scale(1.05);
+}
+
+.pest-image-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.7em;
+    color: #94a3b8;
+}
+
+.pest-card-header {
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pest-card-header h3 {
+    margin: 0 0 4px 0;
+    color: white;
+    font-size: 1.2em;
+}
+
+.scientific-name {
+    color: #94a3b8;
+    font-size: 0.85em;
+    font-style: italic;
+}
+
+.pest-card-body {
+    padding: 15px 20px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.compact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.compact-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+.detail-label {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.detail-value {
+    color: white;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.severity-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    white-space: nowrap;
+    position: relative;
+    display: inline-block;
+    z-index: 2;
+}
+
+.severity-critical {
+    background: rgba(156, 39, 176, 0.2);
+    color: #9C27B0;
+    border: 1px solid rgba(156, 39, 176, 0.3);
+}
+
+.severity-high {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.severity-medium {
+    background: rgba(255, 152, 0, 0.2);
+    color: #FF9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.severity-low {
+    background: rgba(76, 175, 80, 0.2);
+    color: #4CAF50;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.pest-card-footer {
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    margin-top: auto;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+
+.btn-pest-action {
+    flex: 1;
+    padding: 8px 5px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+    transition: all 0.3s;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn-view {
+    background: rgba(33, 150, 243, 0.2);
+    color: #2196F3;
+    border: 1px solid rgba(33, 150, 243, 0.3);
+}
+
+.btn-edit {
+    background: rgba(255, 152, 0, 0.2);
+    color: #FF9800;
+    border: 1px solid rgba(255, 152, 0, 0.3);
+}
+
+.btn-delete {
+    background: rgba(244, 67, 54, 0.2);
+    color: #f44336;
+    border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.btn-pest-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    opacity: 0.9;
+}
+
+/* Detected images indicator */
+.detected-images-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    color: #94a3b8;
+    margin-top: 5px;
+}
+
+.detected-images-count {
+    background: rgba(33, 150, 243, 0.2);
+    color: #2196F3;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* MODAL */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    padding: 20px;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    background: linear-gradient(145deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.95));
+    backdrop-filter: blur(20px);
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 900px;
+    width: 95%;
+    max-height: 85vh;
+    overflow-y: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    animation: slideIn 0.3s ease-out;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-header h2 {
+    color: #4CAF50;
+    margin: 0;
+    font-size: 1.8em;
+}
+
+.modal-close-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.3s;
+}
+
+.modal-close-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.modal-footer {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Image Gallery */
+.image-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.gallery-image {
+    width: 100%;
+    height: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.gallery-image:hover {
+    transform: scale(1.05);
+    border-color: #4CAF50;
+}
+
+.image-source-badge {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7em;
+    color: #94a3b8;
+}
+
+/* Image info in modal */
+.image-info-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 10px;
+    font-size: 0.85rem;
+}
+
+.image-info-card .info-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.image-info-card .info-label {
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.image-info-card .info-value {
+    color: white;
+    font-weight: 400;
+}
+
+/* View Modal Image */
+.view-modal-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-source-info {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #94a3b8;
+}
+
+/* Buttons */
+.btn-submit {
+    padding: 12px 24px;
+    background: linear-gradient(135deg, #4CAF50, #388E3C);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    font-size: 0.95em;
+}
+
+.btn-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+}
+
+.btn-cancel {
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s;
+    font-size: 0.95em;
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideOut {
+    from { opacity: 1; transform: translateY(0); }
+    to { opacity: 0; transform: translateY(-20px); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .pests-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+    
+    .pest-card {
+        height: 380px;
+    }
+    
+    .modal-content {
+        padding: 20px;
+        width: 95%;
+        max-height: 90vh;
+    }
+    
+    .image-gallery {
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 10px;
+    }
+}
+
+/* Form elements in modal */
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 8px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.form-input, .form-textarea, .form-select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: white;
+    font-size: 1em;
+    transition: all 0.3s;
+}
+
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+.form-textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+</style>
+
+<div class="pest-management-container">
+    <div class="pest-header">
+        <h1><i class="fas fa-bug"></i> Pest Management</h1>
+        <!-- <button class="btn-add-pest" onclick="showAddPestModal()">
+            <i class="fas fa-plus"></i> Add New Pest
+        </button> -->
+    </div>
+    
+    <!-- Pest Statistics -->
+    <div class="pest-stats-grid">
+        <div class="pest-stat-card">
+            <h3>{{ pests|length }}</h3>
+            <p>Total Pests in Database</p>
+        </div>
+        <div class="pest-stat-card">
+            <h3>{{ pest_detection_counts|length }}</h3>
+            <p>Detected Pest Types</p>
+        </div>
+        <div class="pest-stat-card">
+            <h3>{{ pest_detection_counts.values()|sum }}</h3>
+            <p>Total Detections</p>
+        </div>
+        <div class="pest-stat-card">
+            <h3>{{ (pest_detection_counts.values()|sum / pests|length)|round|int if pests|length > 0 else 0 }}</h3>
+            <p>Avg. Detections per Pest</p>
+        </div>
+    </div>
+    
+    <!-- Pests Grid -->
+    <div class="pests-grid">
+        {% for pest in pests %}
+        <div class="pest-card" data-pest-id="{{ pest._id }}">
+            <!-- Pest Image - Show detected image if available, otherwise show main image -->
+            <div class="pest-card-image" onclick="viewPest('{{ pest._id }}')" style="cursor: pointer;">
+                {% if pest.detected_image_url %}
+                <img src="{{ pest.detected_image_url }}" alt="{{ pest.name }}" 
+                     onerror="this.onerror=null; this.src='{{ pest.image_url if pest.image_url else "/static/images/pests/default.jpg" }}'">
+                {% elif pest.image_url %}
+                <img src="{{ pest.image_url }}" alt="{{ pest.name }}" 
+                     onerror="this.src='/static/images/pests/default.jpg'">
+                {% else %}
+                <img src="/static/images/pests/default.jpg" alt="{{ pest.name }}">
+                {% endif %}
+                <div class="pest-image-overlay">
+                    {% if pest.category == 'hardcoded' %}
+                    Hardcoded
+                    {% elif pest.category == 'detected' %}
+                    Detected
+                    {% else %}
+                    Uploaded
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="pest-card-header">
+                <h3>{{ pest.name }}</h3>
+                {% if pest.scientific_name %}
+                <div class="scientific-name">{{ pest.scientific_name }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="pest-card-body">
+                <div class="compact-details">
+                    <div class="compact-item">
+                        <span class="detail-label">Severity</span>
+                        <span class="severity-badge severity-{{ pest.severity|default('medium')|lower }}">
+                            {{ pest.severity|default('Medium')|upper }}
+                        </span>
+                    </div>
+                    <div class="compact-item">
+                        <span class="detail-label">Category</span>
+                        <span class="detail-value">{{ pest.category|default('Custom')|upper }}</span>
+                    </div>
+                    <div class="compact-item">
+                        <span class="detail-label">Detections</span>
+                        <span class="detail-value">{{ pest.detection_count|default(0) }}</span>
+                    </div>
+                    {% if pest.image_url %}
+                    <div class="compact-item">
+                        <span class="detail-label">Image Source</span>
+                        <span class="detail-value" style="font-size: 0.8em;">
+                            {% if pest.image_url.startswith('http') %}
+                            Cloudinary
+                            {% elif pest.image_url.startswith('/static/') %}
+                            Local
+                            {% else %}
+                            External
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Detected Images Indicator -->
+                    {% if pest.detection_count and pest.detection_count > 0 %}
+                    <div class="detected-images-indicator">
+                        <i class="fas fa-images"></i>
+                        <span>{{ pest.detection_count }} detection{{ 's' if pest.detection_count > 1 else '' }}</span>
+                        <span class="detected-images-count" onclick="viewPest('{{ pest._id }}'); event.stopPropagation();" 
+                              style="cursor: pointer;" title="View detected images">
+                            <i class="fas fa-eye"></i> View Images
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="pest-card-footer">
+                <div class="action-buttons">
+                    <button class="btn-pest-action btn-view" onclick="viewPest('{{ pest._id }}')">
+                        <i class="fas fa-eye"></i> View
+                    </button>
+                    <button class="btn-pest-action btn-edit" onclick="editPest('{{ pest._id }}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn-pest-action btn-delete" onclick="deletePest('{{ pest._id }}', '{{ pest.name }}')">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Hidden modal templates -->
+<div id="modalTemplate" style="display: none;">
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Modal Title</h2>
+                <button class="modal-close-btn" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalBody">
+                <!-- Modal content will be inserted here -->
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <button type="button" class="btn-cancel" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="pestModalTemplate" style="display: none;">
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New Pest</h2>
+                <button class="modal-close-btn" onclick="closeModal()">×</button>
+            </div>
+            
+            <form id="pestForm">
+                <input type="hidden" id="pestId" name="pest_id">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Pest Name *</label>
+                        <input type="text" id="name" name="name" class="form-input" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Scientific Name</label>
+                        <input type="text" id="scientific_name" name="scientific_name" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Bengali Name (Optional)</label>
+                        <input type="text" id="bengali_name" name="bengali_name" class="form-input">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Image Source</label>
+                        <select id="image_source" name="image_source" class="form-select" onchange="toggleImageSource()">
+                            <option value="upload">Upload New Image</option>
+                            <option value="url">Use Image URL</option>
+                            <option value="detected">Use Detected Images</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Image Upload Section -->
+                <div id="imageUploadSection" class="form-group full-width">
+                    <label class="form-label">Upload Image</label>
+                    <input type="file" id="image_file" name="image_file" class="form-input" 
+                           accept="image/*" onchange="previewImage(event)">
+                    <div id="imagePreview" style="margin-top: 10px;"></div>
+                </div>
+                
+                <!-- Image URL Section -->
+                <div id="imageUrlSection" class="form-group full-width" style="display: none;">
+                    <label class="form-label">Image URL</label>
+                    <input type="text" id="image_url" name="image_url" class="form-input" 
+                           placeholder="https://example.com/image.jpg">
+                    <div id="urlPreview" style="margin-top: 10px;"></div>
+                </div>
+                
+                <!-- Detected Images Section -->
+                <div id="detectedImagesSection" class="form-group full-width" style="display: none;">
+                    <label class="form-label">Select from Detected Images</label>
+                    <div id="detectedImagesGallery" class="image-gallery">
+                        <!-- Will be populated by JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label class="form-label">Description *</label>
+                    <textarea id="description" name="description" class="form-textarea" required></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label class="form-label">Harmful Effects (One per line)</label>
+                    <textarea id="harmful_effects" name="harmful_effects" class="form-textarea" 
+                              placeholder="Enter each harmful effect on a new line"></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label class="form-label">Organic Solutions (One per line)</label>
+                    <textarea id="organic_solutions" name="organic_solutions" class="form-textarea"
+                              placeholder="Enter each organic solution on a new line"></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label class="form-label">Chemical Pesticides (One per line)</label>
+                    <textarea id="chemical_pesticides" name="chemical_pesticides" class="form-textarea"
+                              placeholder="Enter each chemical pesticide on a new line"></textarea>
+                </div>
+                
+                <div class="form-group full-width">
+                    <label class="form-label">Prevention Methods (One per line)</label>
+                    <textarea id="prevention_methods" name="prevention_methods" class="form-textarea"
+                              placeholder="Enter each prevention method on a new line"></textarea>
+                </div>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Severity</label>
+                        <select id="severity" name="severity" class="form-select">
+                            <option value="low">Low</option>
+                            <option value="medium" selected>Medium</option>
+                            <option value="high">High</option>
+                            <option value="critical">Critical</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <select id="category" name="category" class="form-select">
+                            <option value="hardcoded">Hardcoded</option>
+                            <option value="admin_added" selected>Admin Added</option>
+                            <option value="detected">Detected</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">
+                        <i class="fas fa-plus"></i> Add Pest
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentModal = null;
+let isEditMode = false;
+let currentPestId = null;
+
+// Utility function to escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Show add pest modal
+function showAddPestModal() {
+    isEditMode = false;
+    currentPestId = null;
+    
+    // Create modal from template
+    const template = document.getElementById('pestModalTemplate').innerHTML;
+    const modalDiv = document.createElement('div');
+    modalDiv.innerHTML = template;
+    document.body.appendChild(modalDiv);
+    
+    currentModal = modalDiv;
+    document.body.style.overflow = 'hidden';
+    
+    // Set up form submission
+    const form = document.getElementById('pestForm');
+    form.addEventListener('submit', handlePestSubmit);
+    
+    // Load detected images
+    loadDetectedImages();
+    
+    // Reset all fields
+    resetForm();
+    
+    // Add click handler for overlay (click outside to close)
+    const overlay = modalDiv.querySelector('.modal-overlay');
+    if (overlay) {
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay) {
+                closeModal();
+            }
+        });
+    }
+    
+    // Add escape key handler
+    document.addEventListener('keydown', handleEscapeKey);
+}
+
+// Show edit pest modal
+async function editPest(pestId) {
+    try {
+        const response = await fetch(`/admin/api/pests/${pestId}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            showNotification(data.error || 'Failed to fetch pest details', 'error');
+            return;
+        }
+        
+        isEditMode = true;
+        currentPestId = pestId;
+        
+        // Create modal from template
+        const template = document.getElementById('pestModalTemplate').innerHTML;
+        const modalDiv = document.createElement('div');
+        modalDiv.innerHTML = template;
+        document.body.appendChild(modalDiv);
+        
+        currentModal = modalDiv;
+        document.body.style.overflow = 'hidden';
+        
+        // Update modal title and submit button
+        const modalTitle = modalDiv.querySelector('#modalTitle');
+        const submitBtn = modalDiv.querySelector('#submitBtn');
+        
+        if (modalTitle) modalTitle.textContent = 'Edit Pest';
+        if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Pest';
+        
+        // Set pest ID
+        const pestIdInput = modalDiv.querySelector('#pestId');
+        if (pestIdInput) pestIdInput.value = pestId;
+        
+        // Set image source based on existing image
+        const pest = data.pest;
+        const imageSource = modalDiv.querySelector('#image_source');
+        const imageUrl = modalDiv.querySelector('#image_url');
+        
+        if (pest.cloudinary_url || pest.image_url) {
+            if (imageSource) imageSource.value = 'url';
+            if (imageUrl) imageUrl.value = pest.image_url || pest.cloudinary_url;
+            toggleImageSource();
+        }
+        
+        // Load detected images
+        loadDetectedImages();
+        
+        // Populate form with pest data
+        populateForm(pest);
+        
+        // Set up form submission
+        const form = modalDiv.querySelector('#pestForm');
+        if (form) {
+            form.addEventListener('submit', handlePestSubmit);
+        }
+        
+        // Add click handler for overlay (click outside to close)
+        const overlay = modalDiv.querySelector('.modal-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeModal();
+                }
+            });
+        }
+        
+        // Add escape key handler
+        document.addEventListener('keydown', handleEscapeKey);
+        
+    } catch (error) {
+        console.error('Error fetching pest:', error);
+        showNotification('Error loading pest details', 'error');
+    }
+}
+
+// View pest details
+async function viewPest(pestId) {
+    try {
+        // Get pest details
+        const pestResponse = await fetch(`/admin/api/pests/${pestId}`);
+        const pestData = await pestResponse.json();
+        
+        if (!pestData.success) {
+            showNotification(pestData.error || 'Failed to fetch pest details', 'error');
+            return;
+        }
+        
+        const pest = pestData.pest;
+        
+        // Get detected images for this pest
+        const detectedResponse = await fetch(`/admin/api/pests/${pestId}/detected-images`);
+        const detectedData = await detectedResponse.json();
+        
+        // Create modal using template
+        const template = document.getElementById('modalTemplate').cloneNode(true);
+        template.id = 'viewPestModal';
+        template.style.display = 'block';
+        document.body.appendChild(template);
+        
+        currentModal = template;
+        document.body.style.overflow = 'hidden';
+        
+        // Set modal content
+        const title = template.querySelector('#modalTitle');
+        const body = template.querySelector('#modalBody');
+        const footer = template.querySelector('#modalFooter');
+        
+        if (title) title.textContent = pest.name;
+        
+        // Build modal body HTML
+        let bodyHTML = `
+            <!-- Main Image -->
+            ${pest.image_url || pest.cloudinary_url ? `
+            <div style="text-align: center; margin-bottom: 30px;">
+                <img src="${escapeHtml(pest.image_url || pest.cloudinary_url)}" 
+                     alt="${escapeHtml(pest.name)}" 
+                     class="view-modal-image"
+                     onerror="this.src='/static/images/pests/default.jpg'">
+                <div class="image-source-info">
+                    <strong>Image Source:</strong> 
+                    ${pest.cloudinary_public_id ? 'Cloudinary Upload' : 
+                      pest.image_url && pest.image_url.startsWith('http') ? 'External URL' : 
+                      pest.image_url && pest.image_url.startsWith('/static/') ? 'Local Storage' : 
+                      'Hardcoded'}
+                    ${pest.detection_count ? ` | <strong>Total Detections:</strong> ${pest.detection_count}` : ''}
+                </div>
+            </div>
+            ` : ''}
+            
+            <div style="margin-bottom: 20px;">
+                <div style="display: flex; gap: 20px; margin-bottom: 15px; flex-wrap: wrap;">
+                    <div>
+                        <strong>Scientific Name:</strong> ${escapeHtml(pest.scientific_name || 'N/A')}
+                    </div>
+                    <div>
+                        <strong>Category:</strong> ${escapeHtml((pest.category || 'hardcoded').toUpperCase())}
+                    </div>
+                    <div>
+                        <strong>Severity:</strong> 
+                        <span class="severity-badge severity-${escapeHtml(pest.severity || 'medium')}">
+                            ${escapeHtml((pest.severity || 'medium').toUpperCase())}
+                        </span>
+                    </div>
+                    <div>
+                        <strong>Detections:</strong> ${pest.detection_count || 0}
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #4CAF50; margin-bottom: 10px;">Description</h3>
+                <p style="color: rgba(255, 255, 255, 0.8); line-height: 1.6;">${escapeHtml(pest.description || 'No description available')}</p>
+            </div>
+            
+            <!-- Detected Images Gallery -->
+            ${detectedData.images && detectedData.images.length > 0 ? `
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #4CAF50; margin-bottom: 15px;">
+                    <i class="fas fa-images"></i> Detected Images from Users (${detectedData.images.length})
+                </h3>
+                <div class="image-gallery">
+                    ${detectedData.images.map(img => {
+                        const imgInfo = {
+                            url: img.url,
+                            source: img.source,
+                            username: img.username || 'Unknown',
+                            confidence: img.confidence || 0,
+                            upload_date: img.upload_date
+                        };
+                        return `
+                        <div style="position: relative;">
+                            <img src="${escapeHtml(img.url)}" 
+                                 alt="Detected: ${escapeHtml(pest.name)}" 
+                                 class="gallery-image"
+                                 onclick="viewDetectedImage('${escapeHtml(JSON.stringify(imgInfo))}')">
+                            <div class="image-source-badge">
+                                ${escapeHtml(img.source === 'cloudinary' ? 'Cloudinary' : 
+                                  img.source === 'local' ? 'Local' : 'Unknown')}
+                            </div>
+                        </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 10px;">
+                    <i class="fas fa-info-circle"></i> Click on any image to view details
+                </div>
+            </div>
+            ` : ''}
+            
+            ${pest.harmful_effects && pest.harmful_effects.length > 0 ? `
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #4CAF50; margin-bottom: 10px;">
+                    <i class="fas fa-exclamation-triangle"></i> Harmful Effects
+                </h3>
+                <ul style="color: rgba(255, 255, 255, 0.8); padding-left: 20px;">
+                    ${pest.harmful_effects.map(effect => `<li>${escapeHtml(effect)}</li>`).join('')}
+                </ul>
+            </div>
+            ` : ''}
+            
+            ${pest.organic_solutions && pest.organic_solutions.length > 0 ? `
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #4CAF50; margin-bottom: 10px;">
+                    <i class="fas fa-leaf"></i> Organic Solutions
+                </h3>
+                <ul style="color: rgba(255, 255, 255, 0.8); padding-left: 20px;">
+                    ${pest.organic_solutions.map(solution => `<li>${escapeHtml(solution)}</li>`).join('')}
+                </ul>
+            </div>
+            ` : ''}
+            
+            ${pest.chemical_pesticides && pest.chemical_pesticides.length > 0 ? `
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #4CAF50; margin-bottom: 10px;">
+                    <i class="fas fa-flask"></i> Chemical Pesticides
+                </h3>
+                <ul style="color: rgba(255, 255, 255, 0.8); padding-left: 20px;">
+                    ${pest.chemical_pesticides.map(pesticide => `<li>${escapeHtml(pesticide)}</li>`).join('')}
+                </ul>
+            </div>
+            ` : ''}
+            
+            ${pest.prevention_methods && pest.prevention_methods.length > 0 ? `
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #4CAF50; margin-bottom: 10px;">
+                    <i class="fas fa-shield-alt"></i> Prevention Methods
+                </h3>
+                <ul style="color: rgba(255, 255, 255, 0.8); padding-left: 20px;">
+                    ${pest.prevention_methods.map(method => `<li>${escapeHtml(method)}</li>`).join('')}
+                </ul>
+            </div>
+            ` : ''}
+            
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                <div style="color: #94a3b8; font-size: 0.9em;">
+                    <strong>Created:</strong> ${new Date(pest.created_at).toLocaleDateString()} | 
+                    <strong>Last Updated:</strong> ${new Date(pest.updated_at || pest.created_at).toLocaleDateString()} |
+                    <strong>Added By:</strong> ${escapeHtml(pest.added_by || 'System')}
+                </div>
+            </div>
+        `;
+        
+        if (body) body.innerHTML = bodyHTML;
+        
+        // Update footer
+        if (footer) {
+            footer.innerHTML = `
+                <button type="button" class="btn-cancel" onclick="closeModal()">Close</button>
+                <button type="button" class="btn-submit" onclick="editPest('${pestId}')">
+                    <i class="fas fa-edit"></i> Edit Pest
+                </button>
+            `;
+        }
+        
+        // Add click handler for overlay (click outside to close)
+        const overlay = template.querySelector('.modal-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeModal();
+                }
+            });
+        }
+        
+        // Add escape key handler
+        document.addEventListener('keydown', handleEscapeKey);
+        
+    } catch (error) {
+        console.error('Error viewing pest:', error);
+        showNotification('Error viewing pest details', 'error');
+    }
+}
+
+// View detected image with details
+function viewDetectedImage(imgInfoStr) {
+    try {
+        const imgInfo = JSON.parse(imgInfoStr);
+        
+        // Create modal using template
+        const template = document.getElementById('modalTemplate').cloneNode(true);
+        template.id = 'viewDetectedImageModal';
+        template.style.display = 'block';
+        document.body.appendChild(template);
+        
+        currentModal = template;
+        document.body.style.overflow = 'hidden';
+        
+        // Set modal content
+        const title = template.querySelector('#modalTitle');
+        const body = template.querySelector('#modalBody');
+        const footer = template.querySelector('#modalFooter');
+        
+        if (title) title.textContent = 'Detected Image Details';
+        
+        // Build modal body HTML
+        let bodyHTML = `
+            <div style="text-align: center; margin-bottom: 25px;">
+                <img src="${escapeHtml(imgInfo.url)}" 
+                     alt="Detected Image" 
+                     style="max-width: 100%; max-height: 50vh; border-radius: 12px; object-fit: contain;"
+                     onerror="this.src='/static/images/pests/default.jpg'">
+            </div>
+            
+            <div class="image-info-card">
+                <div class="info-row">
+                    <span class="info-label">Source:</span>
+                    <span class="info-value">${imgInfo.source === 'cloudinary' ? 'Cloudinary Upload' : 
+                        imgInfo.source === 'local' ? 'Local File' : 
+                        imgInfo.source === 'detected' ? 'User Detection' : 
+                        'Unknown'}</span>
+                </div>
+                ${imgInfo.username ? `
+                <div class="info-row">
+                    <span class="info-label">Detected By:</span>
+                    <span class="info-value">${escapeHtml(imgInfo.username)}</span>
+                </div>
+                ` : ''}
+                ${imgInfo.confidence ? `
+                <div class="info-row">
+                    <span class="info-label">Confidence:</span>
+                    <span class="info-value">${imgInfo.confidence}%</span>
+                </div>
+                ` : ''}
+                ${imgInfo.upload_date ? `
+                <div class="info-row">
+                    <span class="info-label">Detection Date:</span>
+                    <span class="info-value">${new Date(imgInfo.upload_date).toLocaleDateString()}</span>
+                </div>
+                ` : ''}
+            </div>
+            
+            <div style="margin-top: 25px; text-align: center;">
+                <a href="${escapeHtml(imgInfo.url)}" target="_blank" style="color: #4CAF50; text-decoration: none; margin-right: 15px;">
+                    <i class="fas fa-external-link-alt"></i> Open in new tab
+                </a>
+            </div>
+        `;
+        
+        if (body) body.innerHTML = bodyHTML;
+        
+        // Update footer
+        if (footer) {
+            footer.innerHTML = `
+                <button type="button" class="btn-cancel" onclick="closeModal()">Close</button>
+                <button type="button" class="btn-submit" onclick="useThisImage('${escapeHtml(imgInfo.url)}')">
+                    <i class="fas fa-check"></i> Use This Image
+                </button>
+            `;
+        }
+        
+        // Add click handler for overlay (click outside to close)
+        const overlay = template.querySelector('.modal-overlay');
+        if (overlay) {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === overlay) {
+                    closeModal();
+                }
+            });
+        }
+        
+        // Add escape key handler
+        document.addEventListener('keydown', handleEscapeKey);
+        
+    } catch (error) {
+        console.error('Error viewing detected image:', error);
+        showNotification('Error viewing image details', 'error');
+    }
+}
+
+// Close modal
+function closeModal() {
+    if (currentModal) {
+        currentModal.remove();
+        currentModal = null;
+        document.body.style.overflow = 'auto';
+        document.removeEventListener('keydown', handleEscapeKey);
+    }
+}
+
+// Handle escape key
+function handleEscapeKey(e) {
+    if (e.key === 'Escape' && currentModal) {
+        closeModal();
+    }
+}
+
+// Use this image for the pest
+function useThisImage(url) {
+    if (confirm('Use this image as the main pest image?')) {
+        // Set the image URL in the form if we're in edit mode
+        if (isEditMode && currentPestId) {
+            const imageUrlInput = document.querySelector('#image_url');
+            const imageSourceSelect = document.querySelector('#image_source');
+            
+            if (imageUrlInput) imageUrlInput.value = url;
+            if (imageSourceSelect) imageSourceSelect.value = 'url';
+            
+            toggleImageSource();
+            
+            const urlPreview = document.querySelector('#urlPreview');
+            if (urlPreview) {
+                urlPreview.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                        <img src="${escapeHtml(url)}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;" 
+                             onerror="this.src='/static/images/pests/default.jpg'">
+                        <span style="color: #94a3b8;">Selected image</span>
+                    </div>
+                `;
+            }
+        }
+        closeModal();
+    }
+}
+
+// Load detected images for modal selection
+async function loadDetectedImages() {
+    try {
+        const response = await fetch('/admin/api/detected-images');
+        const data = await response.json();
+        
+        if (data.success && data.images) {
+            const gallery = document.getElementById('detectedImagesGallery');
+            if (gallery) {
+                gallery.innerHTML = data.images.map(img => {
+                    const imgInfo = {
+                        url: img.url,
+                        source: img.source,
+                        pest_name: img.pest_name
+                    };
+                    return `
+                    <div style="position: relative;">
+                        <img src="${escapeHtml(img.url)}" 
+                             alt="${escapeHtml(img.pest_name)}" 
+                             class="gallery-image"
+                             onclick="selectDetectedImage('${escapeHtml(JSON.stringify(imgInfo))}')">
+                        <div class="image-source-badge">${escapeHtml(img.source)}</div>
+                    </div>
+                    `;
+                }).join('');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading detected images:', error);
+    }
+}
+
+// Select detected image
+function selectDetectedImage(imgInfoStr) {
+    try {
+        const imgInfo = JSON.parse(imgInfoStr);
+        const imageUrlInput = document.getElementById('image_url');
+        const imageSourceSelect = document.getElementById('image_source');
+        
+        if (imageUrlInput) imageUrlInput.value = imgInfo.url;
+        if (imageSourceSelect) imageSourceSelect.value = 'url';
+        
+        toggleImageSource();
+        
+        const urlPreview = document.getElementById('urlPreview');
+        if (urlPreview) {
+            urlPreview.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                    <img src="${escapeHtml(imgInfo.url)}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;" 
+                         onerror="this.src='/static/images/pests/default.jpg'">
+                    <span style="color: #94a3b8;">Selected: ${escapeHtml(imgInfo.pest_name)}</span>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error selecting detected image:', error);
+    }
+}
+
+// Toggle image source sections
+function toggleImageSource() {
+    const sourceSelect = document.getElementById('image_source');
+    if (!sourceSelect) return;
+    
+    const source = sourceSelect.value;
+    
+    const uploadSection = document.getElementById('imageUploadSection');
+    const urlSection = document.getElementById('imageUrlSection');
+    const detectedSection = document.getElementById('detectedImagesSection');
+    
+    if (uploadSection) uploadSection.style.display = source === 'upload' ? 'block' : 'none';
+    if (urlSection) urlSection.style.display = source === 'url' ? 'block' : 'none';
+    if (detectedSection) detectedSection.style.display = source === 'detected' ? 'block' : 'none';
+    
+    // Clear previews when switching
+    if (source !== 'url') {
+        const urlPreview = document.getElementById('urlPreview');
+        if (urlPreview) urlPreview.innerHTML = '';
+    }
+}
+
+// Preview uploaded image
+function previewImage(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('imagePreview');
+            if (preview) {
+                preview.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                        <img src="${e.target.result}" 
+                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
+                        <span style="color: #94a3b8;">${escapeHtml(file.name)} (${(file.size/1024).toFixed(1)} KB)</span>
+                    </div>
+                `;
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Delete pest
+async function deletePest(pestId, pestName) {
+    if (!confirm(`Are you sure you want to delete "${pestName}"? This will also delete all associated images and detections.`)) {
+        return;
+    }
+    
+    try {
+        const response = await fetch(`/admin/api/pests/${pestId}/delete`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification(data.message, 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showNotification(data.error || 'Failed to delete pest', 'error');
+        }
+    } catch (error) {
+        console.error('Error deleting pest:', error);
+        showNotification('Error deleting pest', 'error');
+    }
+}
+
+// Handle form submission
+async function handlePestSubmit(e) {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    
+    // Get selected image source
+    const imageSource = document.getElementById('image_source').value;
+    let imageData = {};
+    
+    if (imageSource === 'upload') {
+        const fileInput = document.getElementById('image_file');
+        if (fileInput && fileInput.files.length > 0) {
+            // Create a new FormData for file upload
+            const uploadFormData = new FormData();
+            uploadFormData.append('image_file', fileInput.files[0]);
+            uploadFormData.append('name', formData.get('name'));
+            
+            try {
+                const uploadResponse = await fetch('/admin/api/pests/upload-image', {
+                    method: 'POST',
+                    body: uploadFormData
+                });
+                
+                const uploadResult = await uploadResponse.json();
+                if (uploadResult.success) {
+                    imageData.image_url = uploadResult.image_url;
+                }
+            } catch (uploadError) {
+                console.error('Error uploading image:', uploadError);
+                showNotification('Error uploading image', 'error');
+                return;
+            }
+        }
+    } else if (imageSource === 'url' || imageSource === 'detected') {
+        const imageUrl = document.getElementById('image_url').value;
+        if (imageUrl) {
+            imageData.image_url = imageUrl;
+        }
+    }
+    
+    // Prepare pest data
+    const data = {
+        name: formData.get('name'),
+        scientific_name: formData.get('scientific_name'),
+        bengali_name: formData.get('bengali_name'),
+        description: formData.get('description'),
+        harmful_effects: formData.get('harmful_effects') ? 
+            formData.get('harmful_effects').split('\n').filter(line => line.trim()) : [],
+        organic_solutions: formData.get('organic_solutions') ? 
+            formData.get('organic_solutions').split('\n').filter(line => line.trim()) : [],
+        chemical_pesticides: formData.get('chemical_pesticides') ? 
+            formData.get('chemical_pesticides').split('\n').filter(line => line.trim()) : [],
+        prevention_methods: formData.get('prevention_methods') ? 
+            formData.get('prevention_methods').split('\n').filter(line => line.trim()) : [],
+        severity: formData.get('severity'),
+        category: formData.get('category'),
+        language: 'english',
+        ...imageData
+    };
+    
+    try {
+        if (isEditMode) {
+            // Update existing pest
+            const response = await fetch(`/admin/api/pests/${currentPestId}/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showNotification(result.message, 'success');
+                closeModal();
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification(result.error || 'Failed to update pest', 'error');
+            }
+        } else {
+            // Add new pest
+            const response = await fetch('/admin/api/pests/add', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                showNotification(result.message, 'success');
+                closeModal();
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification(result.error || 'Failed to add pest', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('Error submitting form:', error);
+        showNotification('Error submitting form', 'error');
+    }
+}
+
+// Populate form with pest data
+function populateForm(pest) {
+    const nameInput = document.getElementById('name');
+    const scientificInput = document.getElementById('scientific_name');
+    const bengaliInput = document.getElementById('bengali_name');
+    const descriptionInput = document.getElementById('description');
+    const harmfulEffectsInput = document.getElementById('harmful_effects');
+    const organicSolutionsInput = document.getElementById('organic_solutions');
+    const chemicalPesticidesInput = document.getElementById('chemical_pesticides');
+    const preventionMethodsInput = document.getElementById('prevention_methods');
+    const severitySelect = document.getElementById('severity');
+    const categorySelect = document.getElementById('category');
+    
+    if (nameInput) nameInput.value = pest.name || '';
+    if (scientificInput) scientificInput.value = pest.scientific_name || '';
+    if (bengaliInput) bengaliInput.value = pest.bengali_name || '';
+    if (descriptionInput) descriptionInput.value = pest.description || '';
+    
+    if (harmfulEffectsInput) {
+        harmfulEffectsInput.value = Array.isArray(pest.harmful_effects) ? 
+            pest.harmful_effects.join('\n') : '';
+    }
+    
+    if (organicSolutionsInput) {
+        organicSolutionsInput.value = Array.isArray(pest.organic_solutions) ? 
+            pest.organic_solutions.join('\n') : '';
+    }
+    
+    if (chemicalPesticidesInput) {
+        chemicalPesticidesInput.value = Array.isArray(pest.chemical_pesticides) ? 
+            pest.chemical_pesticides.join('\n') : '';
+    }
+    
+    if (preventionMethodsInput) {
+        preventionMethodsInput.value = Array.isArray(pest.prevention_methods) ? 
+            pest.prevention_methods.join('\n') : '';
+    }
+    
+    if (severitySelect) severitySelect.value = pest.severity || 'medium';
+    if (categorySelect) categorySelect.value = pest.category || 'hardcoded';
+    
+    // Set image URL if exists
+    if (pest.image_url || pest.cloudinary_url) {
+        const imageUrlInput = document.getElementById('image_url');
+        if (imageUrlInput) {
+            imageUrlInput.value = pest.image_url || pest.cloudinary_url;
+            const urlPreview = document.getElementById('urlPreview');
+            if (urlPreview) {
+                urlPreview.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                        <img src="${escapeHtml(pest.image_url || pest.cloudinary_url)}" 
+                             style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;"
+                             onerror="this.src='/static/images/pests/default.jpg'">
+                        <span style="color: #94a3b8;">Current image</span>
+                    </div>
+                `;
+            }
+        }
+    }
+}
+
+// Reset form
+function resetForm() {
+    const form = document.getElementById('pestForm');
+    if (form) {
+        form.reset();
+        
+        const severitySelect = document.getElementById('severity');
+        const categorySelect = document.getElementById('category');
+        const imageSourceSelect = document.getElementById('image_source');
+        
+        if (severitySelect) severitySelect.value = 'medium';
+        if (categorySelect) categorySelect.value = 'admin_added';
+        if (imageSourceSelect) imageSourceSelect.value = 'upload';
+        
+        // Clear all textareas
+        const textareas = form.querySelectorAll('textarea');
+        textareas.forEach(textarea => {
+            textarea.value = '';
+        });
+        
+        // Clear previews
+        const imagePreview = document.getElementById('imagePreview');
+        const urlPreview = document.getElementById('urlPreview');
+        
+        if (imagePreview) imagePreview.innerHTML = '';
+        if (urlPreview) urlPreview.innerHTML = '';
+        
+        // Show upload section by default
+        toggleImageSource();
+    }
+}
+
+// Show notification
+function showNotification(message, type) {
+    // Remove existing notification
+    const existingNotification = document.querySelector('.custom-notification');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+    
+    const notification = document.createElement('div');
+    notification.className = 'custom-notification';
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 16px 24px;
+        border-radius: 12px;
+        color: white;
+        font-weight: 500;
+        z-index: 10001;
+        animation: slideIn 0.3s ease-out;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        backdrop-filter: blur(10px);
+        font-family: inherit;
+        min-width: 300px;
+        max-width: 500px;
+        word-wrap: break-word;
+    `;
+    
+    if (type === 'success') {
+        notification.style.background = 'linear-gradient(135deg, rgba(76, 175, 80, 0.9), rgba(56, 142, 60, 0.9))';
+    } else if (type === 'error') {
+        notification.style.background = 'linear-gradient(135deg, rgba(244, 67, 54, 0.9), rgba(211, 47, 47, 0.9))';
+    } else {
+        notification.style.background = 'linear-gradient(135deg, rgba(33, 150, 243, 0.9), rgba(25, 118, 210, 0.9))';
+    }
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in forwards';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any initialization code here if needed
+});
+</script>
+{% endblock %}

@@ -1,0 +1,873 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+<style>
+    /* User Management Styles */
+    .user-management-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        color: white;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .user-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .user-header h1 {
+        font-size: 2.2em;
+        color: #4CAF50;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .user-controls {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        align-items: center;
+    }
+    
+    .search-box {
+        flex: 1;
+        display: flex;
+        gap: 10px;
+    }
+    
+    .search-box input {
+        flex: 1;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        font-size: 1em;
+    }
+    
+    .search-box button,
+    .btn-add-user {
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #4CAF50, #388E3C);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+        font-size: 0.95em;
+    }
+    
+    .btn-add-user {
+        background: linear-gradient(135deg, #2196F3, #1976D2);
+    }
+    
+    .search-box button:hover,
+    .btn-add-user:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+    }
+    
+    .btn-add-user:hover {
+        box-shadow: 0 5px 15px rgba(33, 150, 243, 0.3);
+    }
+    
+    .users-table-container {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow-x: auto;
+    }
+    
+    .users-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 800px;
+    }
+    
+    .users-table th {
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.4), rgba(76, 175, 80, 0.2));
+        padding: 15px 12px;
+        text-align: left;
+        color: #4CAF50;
+        font-weight: 600;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+        white-space: nowrap;
+        font-size: 0.95em;
+    }
+    
+    .users-table td {
+        padding: 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        vertical-align: middle;
+        font-size: 0.9em;
+        white-space: normal;
+        overflow: visible;
+        max-width: none;
+    }
+    
+    .users-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .user-info-cell {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 200px;
+        width: auto;
+    }
+    
+    .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #2196F3, #00BCD4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: white;
+        font-size: 1em;
+        flex-shrink: 0;
+    }
+    
+    .user-details {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        width: 100%;
+        overflow: visible;
+    }
+    
+    .user-name {
+        font-weight: 600;
+        color: white;
+        margin-bottom: 4px;
+        font-size: 1em;
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        max-width: none;
+        word-wrap: break-word;
+        display: block;
+    }
+    
+    .user-email {
+        font-size: 0.8em;
+        color: rgba(255, 255, 255, 0.7);
+        white-space: normal;
+        overflow: visible;
+        text-overflow: clip;
+        max-width: none;
+        word-wrap: break-word;
+        display: block;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: nowrap;
+        align-items: center;
+    }
+    
+    .btn-action {
+        padding: 6px 12px;
+        border-radius: 6px;
+        border: none;
+        cursor: pointer;
+        font-size: 0.85em;
+        transition: all 0.3s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+        min-width: 100px;
+        justify-content: center;
+    }
+    
+    .btn-toggle {
+        background: rgba(255, 152, 0, 0.2);
+        color: #FF9800;
+        border: 1px solid rgba(255, 152, 0, 0.3);
+    }
+    
+    .btn-delete {
+        background: rgba(244, 67, 54, 0.2);
+        color: #f44336;
+        border: 1px solid rgba(244, 67, 54, 0.3);
+    }
+    
+    .btn-view {
+        background: rgba(33, 150, 243, 0.2);
+        color: #2196F3;
+        border: 1px solid rgba(33, 150, 243, 0.3);
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .no-users {
+        text-align: center;
+        padding: 60px 20px;
+        color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .empty-icon {
+        font-size: 4em;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+    
+    .stats-summary {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .stat-card {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 15px;
+        border-radius: 12px;
+        border-left: 4px solid #4CAF50;
+        transition: transform 0.3s;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .stat-card h3 {
+        font-size: 1.8em;
+        color: white;
+        margin-bottom: 5px;
+    }
+    
+    .stat-card p {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.85em;
+    }
+    
+    /* Modal Styles */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 20px;
+        backdrop-filter: blur(5px);
+    }
+    
+    .modal-content {
+        background: linear-gradient(145deg, rgba(30,41,59,0.95), rgba(15,23,42,0.95));
+        backdrop-filter: blur(20px);
+        padding: 25px;
+        border-radius: 20px;
+        max-width: 500px;
+        width: 100%;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: white;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .user-controls {
+            flex-direction: column;
+        }
+        
+        .stats-summary {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .users-table {
+            font-size: 0.85em;
+            min-width: auto;
+        }
+        
+        .users-table th,
+        .users-table td {
+            padding: 8px 6px;
+        }
+        
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            font-size: 0.9em;
+        }
+        
+        .btn-action {
+            padding: 5px 8px;
+            font-size: 0.8em;
+            min-width: 80px;
+        }
+        
+        .user-name, .user-email {
+            white-space: normal;
+            max-width: 150px;
+        }
+    }
+</style>
+
+<div class="user-management-container">
+    <div class="user-header">
+        <h1><i class="fas fa-users-cog"></i> User Management</h1>
+    </div>
+    
+    <!-- Stats Summary -->
+    <div class="stats-summary">
+        <div class="stat-card">
+            <h3>{{ users|length }}</h3>
+            <p>Total Users</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ users|selectattr('is_active', 'equalto', true)|list|length }}</h3>
+            <p>Active Users</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ users|sum(attribute='total_uploads') if users else 0 }}</h3>
+            <p>Total Uploads</p>
+        </div>
+        <div class="stat-card">
+            <h3>{{ users|sum(attribute='total_queries') if users else 0 }}</h3>
+            <p>Total Queries</p>
+        </div>
+    </div>
+    
+    <!-- Search and Add User Controls -->
+    <div class="user-controls">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search by username, email, or status (activate/deactivate)..." onkeyup="searchUsers()">
+            <button onclick="clearSearch()">
+                <i class="fas fa-times"></i> Clear
+            </button>
+        </div>
+        <button class="btn-add-user" onclick="showAddUserModal()">
+            <i class="fas fa-user-plus"></i> Add New User
+        </button>
+    </div>
+    
+    <!-- Users Table -->
+    <div class="users-table-container">
+        {% if users %}
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="usersTableBody">
+                {% for user in users %}
+                <tr class="user-row" 
+                    data-name="{{ user.username.lower() if user.username else '' }}" 
+                    data-email="{{ user.email.lower() if user.email else '' }}"
+                    data-status="{{ 'activate' if not user.is_active else 'deactivate' }}">
+                    <td>
+                        <div class="user-info-cell">
+                            <div class="user-avatar">
+                                {{ user.username[0]|upper if user.username and user.username|length > 0 else 'U' }}
+                            </div>
+                            <div class="user-details">
+                                <span class="user-name" title="{{ user.username if user.username else 'No Username' }}">
+                                    {{ user.username if user.username else 'No Username' }}
+                                </span>
+                                <span class="user-email" title="{{ user.email if user.email else 'No Email' }}">
+                                    {{ user.email if user.email else 'No Email' }}
+                                </span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if user.created_at %}
+                            {{ user.created_at.strftime('%d %b %Y') if user.created_at else 'N/A' }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn-action btn-view" onclick="viewUserDetails('{{ user._id }}')" title="View Details">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            <button class="btn-action btn-toggle" onclick="toggleUserStatus('{{ user._id }}', {{ user.is_active|lower }})">
+                                <i class="fas fa-power-off"></i> {{ 'Deactivate' if user.is_active else 'Activate' }}
+                            </button>
+                            <button class="btn-action btn-delete" onclick="deleteUser('{{ user._id }}', '{{ user.username if user.username else "User" }}')" title="Delete User">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="no-users">
+            <div class="empty-icon">
+                <i class="fas fa-user-slash"></i>
+            </div>
+            <h3>No Users Found</h3>
+            <p>No users have registered in the system yet.</p>
+            <button class="btn-add-user" onclick="showAddUserModal()" style="margin-top: 20px;">
+                <i class="fas fa-user-plus"></i> Add First User
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// FIXED: Search users by name, email, AND status (activate/deactivate)
+function searchUsers() {
+    const input = document.getElementById('searchInput').value.toLowerCase().trim();
+    const rows = document.getElementsByClassName('user-row');
+    
+    console.log('Searching for:', input); // Debug line
+    
+    // If search is empty, show all rows
+    if (!input) {
+        for (let row of rows) {
+            row.style.display = '';
+        }
+        return;
+    }
+    
+    for (let row of rows) {
+        const name = row.getAttribute('data-name') || '';
+        const email = row.getAttribute('data-email') || '';
+        const status = row.getAttribute('data-status') || '';
+        
+        // Debug: Show what data we're checking
+        console.log('Checking row:', {name, email, status, input});
+        
+        // Show row if search term matches name, email, OR status
+        const matches = name.includes(input) || 
+                       email.includes(input) || 
+                       status.includes(input);
+        
+        row.style.display = matches ? '' : 'none';
+    }
+}
+
+function clearSearch() {
+    document.getElementById('searchInput').value = '';
+    searchUsers();
+}
+
+function showAddUserModal() {
+    const modalHTML = `
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #4CAF50; margin: 0;">Add New User</h2>
+                    <button onclick="closeModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.5em; cursor: pointer;">×</button>
+                </div>
+                
+                <form id="addUserForm" onsubmit="addUser(event)" style="display: flex; flex-direction: column; gap: 15px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; color: rgba(255, 255, 255, 0.9);">Username *</label>
+                        <input type="text" name="username" required 
+                               style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); 
+                                      background: rgba(255, 255, 255, 0.1); color: white; font-size: 0.95em;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; color: rgba(255, 255, 255, 0.9);">Email *</label>
+                        <input type="email" name="email" required 
+                               style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); 
+                                      background: rgba(255, 255, 255, 0.1); color: white; font-size: 0.95em;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; color: rgba(255, 255, 255, 0.9);">Password *</label>
+                        <input type="password" name="password" required 
+                               style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); 
+                                      background: rgba(255, 255, 255, 0.1); color: white; font-size: 0.95em;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; color: rgba(255, 255, 255, 0.9);">Confirm Password *</label>
+                        <input type="password" name="confirm_password" required 
+                               style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.2); 
+                                      background: rgba(255, 255, 255, 0.1); color: white; font-size: 0.95em;">
+                    </div>
+                    
+                    <div>
+                        <label style="display: flex; align-items: center; gap: 8px; color: rgba(255, 255, 255, 0.9);">
+                            <input type="checkbox" name="is_active" checked style="width: 16px; height: 16px;">
+                            <span style="font-size: 0.9em;">Active User (Can login immediately)</span>
+                        </label>
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; margin-top: 15px;">
+                        <button type="button" onclick="closeModal()" 
+                                style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; 
+                                       cursor: pointer; flex: 1; font-weight: 500; font-size: 0.95em;">
+                            Cancel
+                        </button>
+                        <button type="submit" 
+                                style="padding: 10px 20px; background: linear-gradient(135deg, #4CAF50, #388E3C); 
+                                       color: white; border: none; border-radius: 6px; cursor: pointer; flex: 1; 
+                                       font-weight: 500; font-size: 0.95em;">
+                            <i class="fas fa-plus"></i> Add User
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    
+    const modal = document.createElement('div');
+    modal.innerHTML = modalHTML;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+}
+
+async function addUser(event) {
+    event.preventDefault();
+    const form = event.target;
+    const formData = new FormData(form);
+    
+    // Check if passwords match
+    if (formData.get('password') !== formData.get('confirm_password')) {
+        showNotification('Passwords do not match!', 'error');
+        return;
+    }
+    
+    const userData = {
+        username: formData.get('username'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        is_active: formData.get('is_active') === 'on'
+    };
+    
+    try {
+        const response = await fetch('/admin/api/users/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(userData)
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showNotification('User added successfully!', 'success');
+            closeModal();
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showNotification(data.error || 'Failed to add user', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showNotification('Error adding user', 'error');
+    }
+}
+
+function viewUserDetails(userId) {
+    console.log('Fetching details for user:', userId);
+    
+    // Show loading state
+    const originalButton = event.target;
+    const originalText = originalButton.innerHTML;
+    originalButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    originalButton.disabled = true;
+    
+    fetch(`/admin/api/users/${userId}/details`)
+        .then(response => {
+            originalButton.innerHTML = originalText;
+            originalButton.disabled = false;
+            
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error('User details endpoint not found. Please add the API route to your Flask app.');
+                }
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showUserModal(data.user, data.stats);
+            } else {
+                showNotification(data.error || 'Failed to load user details', 'error');
+            }
+        })
+        .catch(error => {
+            originalButton.innerHTML = originalText;
+            originalButton.disabled = false;
+            
+            console.error('Error fetching user details:', error);
+            
+            // If API fails, show fallback modal with available data
+            showFallbackUserModal(userId);
+        });
+}
+
+function showUserModal(user, stats) {
+    // Safe date formatting function
+    function safeDateFormat(dateString) {
+        if (!dateString || dateString === 'N/A' || dateString === 'Invalid Date') {
+            return 'N/A';
+        }
+        
+        // If it's already a formatted string, return it
+        if (typeof dateString === 'string' && 
+            dateString.match(/\d{4}-\d{2}-\d{2}/)) {
+            // Try to parse and format
+            try {
+                const date = new Date(dateString);
+                if (!isNaN(date.getTime())) {
+                    return date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                }
+            } catch (e) {
+                // If parsing fails, return the original string
+                return dateString;
+            }
+        }
+        
+        // If it's a date object from MongoDB
+        if (typeof dateString === 'string' && dateString.includes('T')) {
+            try {
+                const date = new Date(dateString);
+                if (!isNaN(date.getTime())) {
+                    return date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                }
+            } catch (e) {
+                return 'N/A';
+            }
+        }
+        
+        // Try one more time with generic parsing
+        try {
+            const date = new Date(dateString);
+            if (!isNaN(date.getTime())) {
+                return date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                });
+            }
+        } catch (e) {
+            // If all parsing fails, return N/A
+            return 'N/A';
+        }
+        
+        return 'N/A';
+    }
+    
+    const joinedDate = safeDateFormat(user.created_at);
+    
+    const modalHTML = `
+        <div class="modal-overlay">
+            <div class="modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: #4CAF50; margin: 0;">User Details</h2>
+                    <button onclick="closeModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.5em; cursor: pointer;">×</button>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 12px;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #2196F3, #00BCD4); border-radius: 50%; 
+                         display: flex; align-items: center; justify-content: center; font-size: 1.5em; font-weight: bold; color: white;">
+                        ${user.username ? user.username[0].toUpperCase() : 'U'}
+                    </div>
+                    <div style="flex: 1;">
+                        <h3 style="margin: 0 0 5px 0; color: white; font-size: 1.2em;">${user.username || 'No Username'}</h3>
+                        <p style="margin: 0; color: #94a3b8; font-size: 0.9em;">${user.email || 'No Email'}</p>
+                        <p style="margin: 8px 0 0 0; color: #94a3b8; font-size: 0.85em;">
+                            <strong>User ID:</strong> ${user._id}<br>
+                            <strong>Joined:</strong> ${joinedDate}<br>
+                            <strong>Status:</strong> <span style="color: ${user.is_active ? '#4CAF50' : '#f44336'}">
+                                ${user.is_active ? 'Active' : 'Inactive'}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px;">
+                    <div style="padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px; text-align: center;">
+                        <div style="font-size: 1.8em; font-weight: bold; color: #4CAF50;">${stats.total_uploads || 0}</div>
+                        <div style="color: #94a3b8; font-size: 0.85em;">Total Uploads</div>
+                    </div>
+                    <div style="padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px; text-align: center;">
+                        <div style="font-size: 1.8em; font-weight: bold; color: #2196F3;">${stats.total_queries || 0}</div>
+                        <div style="color: #94a3b8; font-size: 0.85em;">Total Queries</div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 20px;">
+                    <button onclick="closeModal()" 
+                            style="padding: 10px 20px; background: #64748b; color: white; border: none; border-radius: 6px; 
+                                   cursor: pointer; flex: 1; font-weight: 500; font-size: 0.95em;">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const modal = document.createElement('div');
+    modal.innerHTML = modalHTML;
+    document.body.appendChild(modal);
+    document.body.style.overflow = 'hidden';
+}
+
+function toggleUserStatus(userId, isActive) {
+    const action = isActive ? 'deactivate' : 'activate';
+    const userAction = isActive ? 'deactivated' : 'activated';
+    
+    if (confirm(`Are you sure you want to ${action} this user? The user will ${isActive ? 'not be able to' : 'be able to'} login after this change.`)) {
+        fetch(`/admin/api/users/${userId}/toggle`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(`User ${userAction} successfully!`, 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification(data.error || `Failed to ${action} user`, 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification(`Error ${action}ing user`, 'error');
+        });
+    }
+}
+
+function deleteUser(userId, username) {
+    if (confirm(`WARNING: Are you sure you want to permanently delete user "${username}"?\n\nThis action will:\n• Remove the user from the database\n• Delete all user data\n• Cannot be undone!\n\nThe user will no longer be able to login.`)) {
+        fetch(`/admin/api/users/${userId}/delete`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification('User deleted successfully!', 'success');
+                setTimeout(() => location.reload(), 1000);
+            } else {
+                showNotification(data.error || 'Failed to delete user', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error deleting user', 'error');
+        });
+    }
+}
+
+function closeModal() {
+    const modal = document.querySelector('.modal-overlay');
+    if (modal) {
+        modal.remove();
+        document.body.style.overflow = 'auto';
+    }
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 14px 20px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 500;
+        z-index: 10001;
+        animation: slideIn 0.3s ease-out;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        max-width: 350px;
+        word-wrap: break-word;
+        font-size: 0.9em;
+    `;
+    
+    if (type === 'success') {
+        notification.style.background = 'linear-gradient(135deg, rgba(76, 175, 80, 0.9), rgba(56, 142, 60, 0.9))';
+    } else if (type === 'error') {
+        notification.style.background = 'linear-gradient(135deg, rgba(244, 67, 54, 0.9), rgba(211, 47, 47, 0.9))';
+    } else {
+        notification.style.background = 'linear-gradient(135deg, rgba(33, 150, 243, 0.9), rgba(25, 118, 210, 0.9))';
+    }
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease-in forwards';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+// Debug function to check search
+function debugSearch() {
+    console.log('=== DEBUG SEARCH ===');
+    const rows = document.getElementsByClassName('user-row');
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        console.log(`Row ${i}:`, {
+            name: row.getAttribute('data-name'),
+            email: row.getAttribute('data-email'),
+            status: row.getAttribute('data-status'),
+            display: row.style.display || 'visible'
+        });
+    }
+    console.log('=== END DEBUG ===');
+}
+</script>
+{% endblock %}

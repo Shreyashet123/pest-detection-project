@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="{{ current_lang }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Pest Detection System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .pest-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+        .confidence-badge {
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            border-radius: 50px;
+        }
+        .pest-card {
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            border: none;
+        }
+        .pest-card .card-header {
+            background-color: #e8f4fd;
+            border-bottom: 3px solid #0d6efd;
+            font-weight: 600;
+        }
+        .solution-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        .harmful-item {
+            border-left: 4px solid #dc3545;
+        }
+        .prevention-item {
+            border-left: 4px solid #ffc107;
+        }
+        .language-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        .uploaded-image {
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            width: 100%;
+            height: auto;
+        }
+        .image-container {
+            max-width: 100%;
+            margin: 0 auto;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .language-section {
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+        }
+        .lang-btn {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .lang-btn.active {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .bangla-text {
+            font-family: 'Noto Sans Bengali', 'Segoe UI', sans-serif;
+        }
+        .hindi-text {
+            font-family: 'Noto Sans Devanagari', 'Segoe UI', sans-serif;
+        }
+    </style>
+    <!-- Google Fonts for Bengali and Hindi -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body class="{% if current_lang == 'bangla' %}bangla-text{% elif current_lang == 'hindi' %}hindi-text{% endif %}">
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <i class="fas fa-bug"></i> 
+                {% if current_lang == 'english' %}Pest Detection System
+                {% elif current_lang == 'bangla' %}পোকা সনাক্তকরণ সিস্টেম
+                {% elif current_lang == 'hindi' %}कीट पहचान प्रणाली
+                {% else %}Pest Detection System{% endif %}
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('user_dashboard') }}">
+                    <i class="fas fa-home"></i> 
+                    {% if current_lang == 'english' %}Dashboard
+                    {% elif current_lang == 'bangla' %}ড্যাশবোর্ড
+                    {% elif current_lang == 'hindi' %}डैशबोर्ड
+                    {% else %}Dashboard{% endif %}
+                </a>
+                <a class="nav-link" href="{{ url_for('history_page') }}">
+                    <i class="fas fa-history"></i> 
+                    {% if current_lang == 'english' %}History
+                    {% elif current_lang == 'bangla' %}ইতিহাস
+                    {% elif current_lang == 'hindi' %}इतिहास
+                    {% else %}History{% endif %}
+                </a>
+                <a class="nav-link" href="{{ url_for('logout') }}">
+                    <i class="fas fa-sign-out-alt"></i> 
+                    {% if current_lang == 'english' %}Logout
+                    {% elif current_lang == 'bangla' %}লগআউট
+                    {% elif current_lang == 'hindi' %}लॉगआउट
+                    {% else %}Logout{% endif %}
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Language Selection Section -->
+       <div class="language-section">
+    <h5><i class="fas fa-language"></i> 
+        {% if current_lang == 'english' %}Select Language
+        {% elif current_lang == 'bangla' %}ভাষা নির্বাচন করুন
+        {% elif current_lang == 'hindi' %}भाषा चुनें
+        {% else %}Select Language{% endif %}:
+    </h5>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('result_with_language', upload_id=upload_id, lang='english') }}" 
+           class="btn btn-primary lang-btn {% if current_lang == 'english' %}active{% endif %}">
+            English
+        </a>
+        <a href="{{ url_for('result_with_language', upload_id=upload_id, lang='bangla') }}" 
+           class="btn btn-success lang-btn {% if current_lang == 'bangla' %}active{% endif %}">
+            বাংলা
+        </a>
+        <a href="{{ url_for('result_with_language', upload_id=upload_id, lang='hindi') }}" 
+           class="btn btn-warning lang-btn {% if current_lang == 'hindi' %}active{% endif %}">
+            हिंदी
+        </a>
+    </div>
+</div>
+
+        <!-- Pest Detection Result -->
+        <div class="pest-header text-center">
+            <!-- Language Display -->
+            <div class="language-badge">
+                <i class="fas fa-language"></i> 
+                {{ 'English' if current_lang == 'english' else 
+                  'বাংলা' if current_lang == 'bangla' else 
+                  'हिंदी' }}
+            </div>
+            
+            <h1><i class="fas fa-search"></i> 
+                {% if current_lang == 'english' %}Pest Detection Result
+                {% elif current_lang == 'bangla' %}পোকা সনাক্তকরণ ফলাফল
+                {% elif current_lang == 'hindi' %}कीट पहचान परिणाम
+                {% else %}Pest Detection Result{% endif %}
+            </h1>
+            <h2 class="mt-3">{{ pest.name }}</h2>
+            
+            <!-- Confidence Score -->
+            <div class="mt-4">
+                <h3>
+                    {% if current_lang == 'english' %}Confidence
+                    {% elif current_lang == 'bangla' %}আত্মবিশ্বাস
+                    {% elif current_lang == 'hindi' %}आत्मविश्वास
+                    {% else %}Confidence{% endif %}: 
+                    <span class="confidence-badge 
+                        {% if confidence|replace('%','')|float > 90 %} bg-success
+                        {% elif confidence|replace('%','')|float > 70 %} bg-warning
+                        {% else %} bg-danger
+                        {% endif %}">
+                        {{ confidence }}
+                    </span>
+                </h3>
+                <p class="mt-2">
+                    {% if current_lang == 'english' %}Detected
+                    {% elif current_lang == 'bangla' %}সনাক্তকৃত
+                    {% elif current_lang == 'hindi' %}पता चला
+                    {% else %}Detected{% endif %}: {{ predicted_class }}
+                </p>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Left Column: Image -->
+            <div class="col-md-4">
+                <div class="card pest-card">
+                    <div class="card-header">
+                        <i class="fas fa-image"></i> 
+                        {% if current_lang == 'english' %}Uploaded Image
+                        {% elif current_lang == 'bangla' %}আপলোড করা ছবি
+                        {% elif current_lang == 'hindi' %}अपलोड की गई छवि
+                        {% else %}Uploaded Image{% endif %}
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="image-container">
+                            {% if image_url %}
+                                <img src="{{ image_url }}" alt="Detected Pest" class="uploaded-image" id="resultImage">
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i> 
+                                    {% if current_lang == 'english' %}Image not found
+                                    {% elif current_lang == 'bangla' %}ছবি পাওয়া যায়নি
+                                    {% elif current_lang == 'hindi' %}छवि नहीं मिली
+                                    {% else %}Image not found{% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="mt-3">
+                            {% if image_url %}
+                                <a href="{{ image_url }}" download class="btn btn-outline-primary">
+                                    <i class="fas fa-download"></i> 
+                                    {% if current_lang == 'english' %}Download Image
+                                    {% elif current_lang == 'bangla' %}ছবি ডাউনলোড করুন
+                                    {% elif current_lang == 'hindi' %}छवि डाउनलोड करें
+                                    {% else %}Download Image{% endif %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="card pest-card">
+                    <div class="card-header">
+                        <i class="fas fa-bolt"></i> 
+                        {% if current_lang == 'english' %}Quick Actions
+                        {% elif current_lang == 'bangla' %}দ্রুত কর্ম
+                        {% elif current_lang == 'hindi' %}त्वरित कार्रवाई
+                        {% else %}Quick Actions{% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a href="{{ url_for('predict_page') }}" class="btn btn-primary">
+                                <i class="fas fa-upload"></i> 
+                                {% if current_lang == 'english' %}Upload Another
+                                {% elif current_lang == 'bangla' %}আরেকটি আপলোড করুন
+                                {% elif current_lang == 'hindi' %}एक और अपलोड करें
+                                {% else %}Upload Another{% endif %}
+                            </a>
+                            <a href="{{ url_for('user_dashboard') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-chart-line"></i> 
+                                {% if current_lang == 'english' %}Go to Dashboard
+                                {% elif current_lang == 'bangla' %}ড্যাশবোর্ডে যান
+                                {% elif current_lang == 'hindi' %}डैशबोर्ड पर जाएं
+                                {% else %}Go to Dashboard{% endif %}
+                            </a>
+                            <button class="btn btn-outline-info" onclick="window.print()">
+                                <i class="fas fa-print"></i> 
+                                {% if current_lang == 'english' %}Print Report
+                                {% elif current_lang == 'bangla' %}রিপোর্ট প্রিন্ট করুন
+                                {% elif current_lang == 'hindi' %}रिपोर्ट प्रिंट करें
+                                {% else %}Print Report{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Pest Details -->
+            <div class="col-md-8">
+                <!-- Pest Description -->
+                <div class="card pest-card">
+                    <div class="card-header">
+                        <i class="fas fa-info-circle"></i> 
+                        {% if current_lang == 'english' %}Description
+                        {% elif current_lang == 'bangla' %}বর্ণনা
+                        {% elif current_lang == 'hindi' %}विवरण
+                        {% else %}Description{% endif %}
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">{{ pest.description }}</p>
+                    </div>
+                </div>
+
+                <!-- Harmful Effects -->
+                <div class="card pest-card">
+                    <div class="card-header">
+                        <i class="fas fa-skull-crossbones"></i> 
+                        {% if current_lang == 'english' %}Harmful Effects
+                        {% elif current_lang == 'bangla' %}ক্ষতিকর প্রভাব
+                        {% elif current_lang == 'hindi' %}हानिकारक प्रभाव
+                        {% else %}Harmful Effects{% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% for effect in pest.harmful_effects %}
+                        <div class="solution-item harmful-item">
+                            <i class="fas fa-exclamation-triangle text-danger me-2"></i>
+                            {{ effect }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Solutions in Two Columns -->
+                <div class="row">
+                    <!-- Organic Solutions -->
+                    <div class="col-md-6">
+                        <div class="card pest-card h-100">
+                            <div class="card-header bg-success text-white">
+                                <i class="fas fa-leaf"></i> 
+                                {% if current_lang == 'english' %}Organic Solutions
+                                {% elif current_lang == 'bangla' %}জৈব সমাধান
+                                {% elif current_lang == 'hindi' %}जैविक समाधान
+                                {% else %}Organic Solutions{% endif %}
+                            </div>
+                            <div class="card-body">
+                                {% for solution in pest.organic_solutions %}
+                                <div class="solution-item">
+                                    <i class="fas fa-seedling text-success me-2"></i>
+                                    {{ solution }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Chemical Pesticides -->
+                    <div class="col-md-6">
+                        <div class="card pest-card h-100">
+                            <div class="card-header bg-warning">
+                                <i class="fas fa-flask"></i> 
+                                {% if current_lang == 'english' %}Chemical Pesticides
+                                {% elif current_lang == 'bangla' %}রাসায়নিক কীটনাশক
+                                {% elif current_lang == 'hindi' %}रासायनिक कीटनाशक
+                                {% else %}Chemical Pesticides{% endif %}
+                            </div>
+                            <div class="card-body">
+                                {% for pesticide in pest.chemical_pesticides %}
+                                <div class="solution-item">
+                                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                                    {{ pesticide }}
+                                </div>
+                                {% endfor %}
+                                <div class="alert alert-warning mt-3">
+                                    <small>
+                                        <i class="fas fa-exclamation-circle"></i>
+                                        {% if current_lang == 'english' %}Use chemicals carefully. Follow safety guidelines and dosage instructions.
+                                        {% elif current_lang == 'bangla' %}রাসায়নিক ব্যবহার সাবধানে করুন। নিরাপত্তা নির্দেশিকা এবং মাত্রার নির্দেশনা অনুসরণ করুন।
+                                        {% elif current_lang == 'hindi' %}रसायनों का उपयोग सावधानी से करें। सुरक्षा दिशानिर्देश और खुराक निर्देशों का पालन करें।
+                                        {% else %}Use chemicals carefully. Follow safety guidelines and dosage instructions.{% endif %}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Prevention Methods -->
+                <div class="card pest-card">
+                    <div class="card-header">
+                        <i class="fas fa-shield-alt"></i> 
+                        {% if current_lang == 'english' %}Prevention Methods
+                        {% elif current_lang == 'bangla' %}প্রতিরোধ পদ্ধতি
+                        {% elif current_lang == 'hindi' %}रोकथाम के तरीके
+                        {% else %}Prevention Methods{% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for method in pest.prevention_methods %}
+                            <div class="col-md-6 mb-2">
+                                <div class="solution-item prevention-item">
+                                    <i class="fas fa-check-circle text-warning me-2"></i>
+                                    {{ method }}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card pest-card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar"></i> 
+                        {% if current_lang == 'english' %}Prediction Details
+                        {% elif current_lang == 'bangla' %}ভবিষ্যদ্বাণী বিবরণ
+                        {% elif current_lang == 'hindi' %}भविष्यवाणी विवरण
+                        {% else %}Prediction Details{% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="alert alert-info">
+                                    <h5><i class="fas fa-bug"></i> 
+                                        {% if current_lang == 'english' %}Detected Pest
+                                        {% elif current_lang == 'bangla' %}সনাক্ত পোকা
+                                        {% elif current_lang == 'hindi' %}पता चला कीट
+                                        {% else %}Detected Pest{% endif %}
+                                    </h5>
+                                    <p class="mb-0"><strong>{{ predicted_class }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="alert alert-secondary">
+                                    <h5><i class="fas fa-percentage"></i> 
+                                        {% if current_lang == 'english' %}Confidence Level
+                                        {% elif current_lang == 'bangla' %}আত্মবিশ্বাস স্তর
+                                        {% elif current_lang == 'hindi' %}आत्मविश्वास स्तर
+                                        {% else %}Confidence Level{% endif %}
+                                    </h5>
+                                    <p class="mb-0"><strong>{{ confidence }}</strong></p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="alert alert-light">
+                                    <h5><i class="fas fa-clock"></i> 
+                                        {% if current_lang == 'english' %}Detection Time
+                                        {% elif current_lang == 'bangla' %}সনাক্তকরণ সময়
+                                        {% elif current_lang == 'hindi' %}पहचान समय
+                                        {% else %}Detection Time{% endif %}
+                                    </h5>
+                                    <p class="mb-0"><strong>{{ now.strftime('%Y-%m-%d %H:%M:%S') if now else '' }}</strong></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="text-center mt-4 mb-5">
+            <a href="{{ url_for('user_dashboard') }}" class="btn btn-lg btn-primary">
+                <i class="fas fa-home"></i> 
+                {% if current_lang == 'english' %}Back to Dashboard
+                {% elif current_lang == 'bangla' %}ড্যাশবোর্ডে ফিরে যান
+                {% elif current_lang == 'hindi' %}डैशबोर्ड पर वापस जाएं
+                {% else %}Back to Dashboard{% endif %}
+            </a>
+            <a href="{{ url_for('user_dashboard') }}" class="btn btn-lg btn-outline-secondary ms-2">
+                <i class="fas fa-history"></i> 
+                {% if current_lang == 'english' %}View History
+                {% elif current_lang == 'bangla' %}ইতিহাস দেখুন
+                {% elif current_lang == 'hindi' %}इतिहास देखें
+                {% else %}View History{% endif %}
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const resultImage = document.getElementById('resultImage');
+    
+    if (resultImage) {
+        resultImage.onerror = function() {
+            console.error('Failed to load image:', this.src);
+            
+            // Try to use a fallback image
+            this.src = '/static/images/placeholder.jpg';
+            
+            // Show error message to user
+            const imageErrorDiv = document.getElementById('imageError');
+            if (imageErrorDiv) {
+                imageErrorDiv.innerHTML = `
+                    <div class="alert alert-warning mt-2">
+                        <i class="fas fa-exclamation-triangle"></i> 
+                        Image failed to load. Showing placeholder instead.
+                    </div>
+                `;
+            }
+        };
+        
+        // Log when image loads successfully
+        resultImage.onload = function() {
+            console.log('Image loaded successfully:', this.src);
+        };
+    } else {
+        console.warn('resultImage element not found');
+    }
+    
+    // Also add a timeout to check if image loaded
+    setTimeout(function() {
+        if (resultImage && resultImage.naturalWidth === 0) {
+            console.log('Image check timeout - image might not have loaded');
+        }
+    }, 2000);
+});
+</script>
+</body>
+</html>

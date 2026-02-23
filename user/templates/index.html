@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<div class="hero-center">
+    <h1>{{ lang.get('hero_title') if lang else 'WORRIED WITH VARIOUS PESTS?' }}</h1>
+
+    <p>
+        {{ lang.get('hero_subtitle') if lang else "Don't worry, we will help you out with fastest Pest Identification system ever!" }}
+    </p>
+
+    <div class="hero-buttons">
+        <button onclick="window.location.href='{{ url_for('predict_page') if session.get('role') == 'user' else url_for('login') }}'">
+            {{ lang.get('hero_btn_identify') if lang else 'IDENTIFY PEST' }}
+        </button>
+        <button class="outline" onclick="window.location.href='{{ url_for('about_us') }}'">
+            {{ lang.get('hero_btn_learn') if lang else 'LEARN MORE' }}
+        </button>
+        {% if not session.get('role') %}
+<button onclick="window.location.href='{{ url_for('login') }}'" style="background: #3498db;">
+    <i class="fas fa-rocket"></i> GET STARTED
+</button>
+{% endif %}
+    </div>
+</div>
+
+
+{% endblock %}

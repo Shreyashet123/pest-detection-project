@@ -1,0 +1,633 @@
+*{
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    box-sizing: border-box;
+}
+.bc-1{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh;
+}
+.navbar{
+    width: 85%;
+    margin: auto;
+    padding: 35px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.logo{
+    width: 60px;
+    cursor: pointer;
+}
+.navbar ul li{
+    list-style: none;
+    display: inline-block;
+    margin: 0 20px;
+    position: relative;
+}
+.navbar ul li a{
+    text-decoration: none;
+    color: #fff;
+    text-transform: uppercase;
+}
+.navbar ul li::after{
+    content: '';
+    height: 3px;
+    width: 0;
+    background: #819A20;
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    transition: 0.5s;
+}
+.navbar ul li:hover:after{
+    width: 100%;
+}
+section{
+    height: 100vh;
+}
+.frame-3{
+    background-color: #819A20;
+}
+.content{
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+    color: #fff;
+}
+.content h1{
+    font-size: 70px;
+    margin-top: 80px;
+}
+.content p{
+    margin: 20px auto;
+    font-weight: 100;
+    line-height: 25px;
+}
+button{
+    width: 200px;
+    padding: 15px 0;
+    text-align: center;
+    margin: 0px 10px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 2px solid #819A20;
+    background: transparent;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 🔥 FIX: limit span ONLY inside button */
+button span{
+    background: #819A20;
+    height: 100%;
+    width: 0;
+    border-radius: 25px;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: -1;
+    transition: 0.5s;
+}
+
+button:hover span{
+    width: 100%;
+}
+button:hover {
+    border: 2px solid #819A20; /* Keep the border, just match the color */
+    color: #fff;
+}
+input[type=file]::file-selector-button {
+  margin-right: 20px;
+  border: none;
+  background: #819A20;
+  padding: 10px 20px;
+  border-radius: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: background .2s ease-in-out;
+}
+
+input[type=file]::file-selector-button:hover {
+  background: #067528;
+}
+@media(max-width: 700px){
+    .content h1{
+        font-size: 25px;
+        margin-top: 80px;
+    }
+    .content h2{
+        font-size: 20px;
+        margin-top: 80px;
+    }
+    .content p{
+        margin: 20px auto;
+        font-weight: 100;
+        line-height: 25px;
+    }
+    button{
+        width: 120px;
+        padding: 15px 0;
+        text-align: center;
+        margin: 20px 10px;
+        border-radius: 25px;
+        font-weight: bold;
+        border: 2px solid #819A20;
+        background: transparent;
+        color: #fff;
+        position: relative;
+    }
+   .navbar {
+        flex-direction: column; /* Stack logo and menu */
+        padding: 10px 0;
+    }
+    .navbar ul {
+        margin-top: 20px;
+        text-align: center;
+    }
+    .navbar ul li {
+        display: block;
+        margin: 10px 0;
+    }
+}
+.card{
+    padding: 10px;
+    width: 750px;
+    height: 550px;
+    color: #fff;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(50px);
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+}
+.card-img-body{
+    padding: 0px;
+    width: 250px;
+    height: 300px;
+    overflow: hidden;
+}
+.card-img{
+    width: 100%;
+    display: block;
+    user-select: none;
+    pointer-events: none;
+}
+.card-log{
+    padding: 10px;
+    width: 750px;
+    height: 550px;
+    color: #fff;
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.4);
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(50px);
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+}
+.form-box {
+    width: 90%;
+    max-width: 450px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 30px 40px; /* Reduced padding slightly to save space */
+    text-align: center;
+    border-radius: 10px;
+    /* ADD THESE: */
+    max-height: 90vh;
+    overflow-y: auto; 
+    display: flex;
+    flex-direction: column;
+}
+.form-box h1{
+    font-size: 30px;
+    margin-bottom: 60px;
+    color: #000;
+    position: relative;
+}
+.form-box h1::after{
+    content: '';
+    width: 30px;
+    height: 4px;
+    border-radius: 3px;
+    background: #000;
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.input-field{
+    background: #eaeaee;
+    margin: 15px 0;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    margin-top: 30px;
+}
+input{
+    width: 100%;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    padding: 18px 15px;
+}
+.input-field i{
+    margin-left: 15px;
+    color: #999;
+}
+.btn-field {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    padding-top: 10px;
+    background: #fff; /* Ensures background matches box */
+    z-index: 10;
+}
+.btn-field button{
+    flex-basis: 48%;
+    background: #819A20;
+    color: #fff;
+    height: 40px;
+    border-radius: 20px;
+    border: 0;
+    outline: 0;
+    cursor: pointer;
+}
+.input-group {
+    min-height: 280px; /* Changed from height to min-height */
+    height: auto;      /* Allows it to grow with content */
+    margin-bottom: 20px;
+}
+.card-form{
+    padding: 10px;
+    width: 750px;
+    height: 650px;
+    color: #000;
+    border-radius: 10px;
+    border: 0;
+    background: #fff;
+    backdrop-filter: blur(50px);
+    box-shadow: 0 0 20px rgba(0,0,0,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 30px;
+}
+.card-input-field{
+    background: #eaeaee;
+    margin: 15px 0;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+}
+.card-textarea{
+    width: 450px;
+    height: 150px;
+    background: #eaeaee;
+    margin: 15px 0;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+}
+textarea{
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: 0;
+    outline: 0;
+    padding: 18px 15px;
+    resize: none;
+}
+.bc-2{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80vh !important;
+}
+.details-box {
+    width: 90%;
+    max-width: 1300px;
+    height: auto;
+    margin: 50px auto; /* Change from position: absolute to auto margin */
+    position: relative; /* Change from absolute */
+    left: 0;
+    transform: none;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+}
+ul {
+    margin: 0;
+    padding: 0;
+}
+li {
+    list-style-type: none;
+}
+/* ===== RESPONSIVE ADDITIONS FOR STYLE1.CSS ===== */
+
+/* Large screens (1200px and above) */
+@media (min-width: 1200px) {
+    .navbar {
+        width: 80%;
+    }
+    .card, .card-log, .card-form {
+        max-width: 800px;
+    }
+    .form-box {
+        max-width: 500px;
+    }
+    .details-box {
+        max-width: 1400px;
+    }
+}
+
+/* Tablets (768px to 991px) */
+@media (max-width: 991px) {
+    .navbar {
+        width: 90%;
+        padding: 25px 0;
+    }
+    .navbar ul li {
+        margin: 0 10px;
+    }
+    .navbar ul li a {
+        font-size: 13px;
+    }
+    .content h1 {
+        font-size: 50px;
+    }
+    .content p {
+        font-size: 18px;
+    }
+    button {
+        width: 180px;
+        padding: 12px 0;
+        font-size: 15px;
+    }
+    .card, .card-log, .card-form {
+        width: 90%;
+        max-width: 600px;
+        padding: 15px;
+    }
+    .form-box {
+        max-width: 400px;
+        padding: 40px 50px;
+    }
+    .details-box {
+        width: 90%;
+        max-width: 1000px;
+        padding: 40px 50px;
+    }
+}
+
+/* Small tablets (600px to 767px) */
+@media (max-width: 767px) {
+    .bc-1, .bc-2 {
+        height: 70vh;
+    }
+    .navbar {
+        padding: 20px 0;
+    }
+    .logo {
+        width: 50px;
+    }
+    .content h1 {
+        font-size: 35px;
+        margin-top: 60px;
+    }
+    .content h2 {
+        font-size: 25px;
+    }
+    .content p {
+        font-size: 16px;
+        margin: 15px auto;
+        line-height: 1.4;
+    }
+    button {
+        width: 150px;
+        padding: 12px 0;
+        font-size: 14px;
+        margin: 5px;
+    }
+    .card, .card-log, .card-form {
+        width: 95%;
+        padding: 12px;
+        gap: 20px;
+    }
+    .card-img-body {
+        width: 200px;
+        height: 250px;
+    }
+    .form-box {
+        width: 95%;
+        padding: 30px 35px;
+    }
+    .form-box h1 {
+        font-size: 25px;
+        margin-bottom: 40px;
+    }
+    input, textarea {
+        padding: 15px;
+        font-size: 15px;
+    }
+    .card-textarea {
+        width: 100%;
+        height: 120px;
+    }
+    .details-box {
+        width: 95%;
+        padding: 30px 35px;
+    }
+}
+
+/* Mobile phones (480px to 599px) */
+@media (max-width: 599px) {
+    .navbar {
+        width: 95%;
+        padding: 15px 0;
+    }
+    .navbar ul li {
+        margin: 0 8px;
+    }
+    .navbar ul li a {
+        font-size: 12px;
+    }
+    .content h1 {
+        font-size: 28px;
+        margin-top: 50px;
+    }
+    .content h2 {
+        font-size: 20px;
+    }
+    .content p {
+        font-size: 14px;
+        margin: 12px auto;
+        line-height: 1.3;
+    }
+    button {
+        width: 130px;
+        padding: 10px 0;
+        font-size: 13px;
+        margin: 4px;
+    }
+    .card, .card-log, .card-form {
+        width: 98%;
+        padding: 10px;
+        gap: 15px;
+    }
+    .card-img-body {
+        width: 180px;
+        height: 220px;
+    }
+    .form-box {
+        padding: 25px 30px;
+    }
+    .form-box h1 {
+        font-size: 22px;
+        margin-bottom: 30px;
+    }
+    .input-field, .card-input-field {
+        margin: 12px 0;
+    }
+    input, textarea {
+        padding: 12px;
+        font-size: 14px;
+    }
+    .btn-field button {
+        height: 35px;
+        font-size: 13px;
+    }
+    .card-textarea {
+        height: 100px;
+    }
+    .details-box {
+        padding: 25px 30px;
+    }
+}
+
+/* Small mobile phones (below 480px) */
+@media (max-width: 480px) {
+    .navbar ul li {
+        margin: 0 5px;
+    }
+    .navbar ul li a {
+        font-size: 11px;
+    }
+    .content h1 {
+        font-size: 24px;
+        margin-top: 40px;
+    }
+    .content h2 {
+        font-size: 18px;
+    }
+    button {
+        width: 120px;
+        padding: 8px 0;
+        font-size: 12px;
+        margin: 3px;
+    }
+    input[type=file]::file-selector-button {
+        padding: 8px 15px;
+        font-size: 12px;
+        margin-right: 15px;
+    }
+    .card, .card-log, .card-form {
+        padding: 8px;
+        gap: 12px;
+    }
+    .card-img-body {
+        width: 150px;
+        height: 180px;
+    }
+    .form-box {
+        padding: 20px 25px;
+    }
+    .form-box h1 {
+        font-size: 20px;
+        margin-bottom: 25px;
+    }
+    input, textarea {
+        padding: 10px;
+        font-size: 13px;
+    }
+    .btn-field button {
+        height: 32px;
+        font-size: 12px;
+        min-width: 100px;
+    }
+    .details-box {
+        padding: 20px 25px;
+    }
+}
+
+/* Very small mobile phones (below 360px) */
+@media (max-width: 360px) {
+    .navbar ul li a {
+        font-size: 10px;
+    }
+    .content h1 {
+        font-size: 20px;
+    }
+    .content h2 {
+        font-size: 16px;
+    }
+    .content p {
+        font-size: 12px;
+    }
+    button {
+        width: 100px;
+        padding: 7px 0;
+        font-size: 11px;
+    }
+    .card-img-body {
+        width: 120px;
+        height: 150px;
+    }
+    .form-box {
+        padding: 15px 20px;
+    }
+    .form-box h1 {
+        font-size: 18px;
+    }
+    input, textarea {
+        padding: 8px;
+        font-size: 12px;
+    }
+}
+
+/* Landscape mode */
+@media (max-height: 500px) and (orientation: landscape) {
+    .bc-1, .bc-2 {
+        height: auto;
+        min-height: 100vh;
+        padding: 20px;
+    }
+    section {
+        min-height: auto;
+        padding: 20px;
+    }
+    .card, .card-log, .card-form {
+        margin: 10px auto;
+    }
+}

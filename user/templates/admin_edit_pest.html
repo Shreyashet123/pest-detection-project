@@ -1,0 +1,299 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<style>
+    .edit-pest-container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 30px;
+        color: white;
+    }
+    
+    .edit-pest-header {
+        text-align: center;
+        margin-bottom: 40px;
+        padding: 30px;
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.7), rgba(255, 152, 0, 0.3));
+        border-radius: 15px;
+        border-left: 8px solid #FF9800;
+    }
+    
+    .edit-pest-header h1 {
+        color: #FF9800;
+        font-size: 2.5em;
+        margin-bottom: 15px;
+    }
+    
+    .edit-pest-header p {
+        font-size: 1.1em;
+        opacity: 0.9;
+    }
+    
+    .pest-form {
+        background: rgba(255, 255, 255, 0.05);
+        padding: 40px;
+        border-radius: 15px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 10px;
+        color: #4CAF50;
+        font-weight: 600;
+        font-size: 1.1em;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 15px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid #4CAF50;
+        border-radius: 8px;
+        color: white;
+        font-size: 16px;
+        font-family: inherit;
+    }
+    
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #FF9800;
+        box-shadow: 0 0 10px rgba(255, 152, 0, 0.3);
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    .image-preview {
+        width: 200px;
+        height: 150px;
+        border: 2px solid #4CAF50;
+        border-radius: 8px;
+        margin-top: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .image-preview img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: cover;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 15px;
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .submit-btn, .cancel-btn {
+        flex: 1;
+        padding: 15px 30px;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+    
+    .submit-btn {
+        background: linear-gradient(135deg, #4CAF50, #388E3C);
+        color: white;
+    }
+    
+    .submit-btn:hover {
+        background: linear-gradient(135deg, #388E3C, #2E7D32);
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+    }
+    
+    .cancel-btn {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        text-decoration: none;
+        text-align: center;
+    }
+    
+    .cancel-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="edit-pest-container">
+    <!-- Header -->
+    <div class="edit-pest-header">
+        <h1><i class="fas fa-edit"></i> Edit Pest: {{ pest.name }}</h1>
+        <p>Update pest information. Changes will be visible to all users.</p>
+    </div>
+    
+    <!-- Pest Form -->
+    <form method="POST" enctype="multipart/form-data" class="pest-form">
+        <!-- Basic Information -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="name">Pest Name</label>
+                <input type="text" id="name" name="name" required 
+                       value="{{ pest.name }}" readonly>
+                <div style="font-size: 0.9em; color: #aaa; margin-top: 5px;">
+                    <i class="fas fa-info-circle"></i> Pest name cannot be changed
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="scientific_name">Scientific Name</label>
+                <input type="text" id="scientific_name" name="scientific_name" 
+                       value="{{ pest.scientific_name if pest.scientific_name else '' }}"
+                       placeholder="e.g., Aphidoidea, Bemisia tabaci">
+            </div>
+        </div>
+        
+        <!-- Image Preview -->
+        <div class="form-group">
+            <label>Current Image</label>
+            <div class="image-preview">
+                {% if pest.image_url %}
+                <img src="{{ pest.image_url }}" alt="{{ pest.name }}" id="currentImage">
+                {% else %}
+                <i class="fas fa-image fa-3x" style="color: #4CAF50;"></i>
+                {% endif %}
+            </div>
+            <div style="font-size: 0.9em; color: #aaa; margin-top: 5px;">
+                <i class="fas fa-camera"></i> Upload new image to replace current
+            </div>
+        </div>
+        
+        <!-- Image Upload -->
+        <div class="form-group">
+            <label for="image">Upload New Image (Optional)</label>
+            <input type="file" id="image" name="image" accept="image/*">
+        </div>
+        
+        <!-- Description -->
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description" name="description" required>{{ pest.description }}</textarea>
+        </div>
+        
+        <!-- Severity -->
+        <div class="form-group">
+            <label for="severity">Severity Level</label>
+            <select id="severity" name="severity">
+                <option value="low" {% if pest.severity == 'low' %}selected{% endif %}>Low</option>
+                <option value="medium" {% if pest.severity == 'medium' %}selected{% endif %}>Medium</option>
+                <option value="high" {% if pest.severity == 'high' %}selected{% endif %}>High</option>
+                <option value="very_high" {% if pest.severity == 'very_high' %}selected{% endif %}>Very High</option>
+            </select>
+        </div>
+        
+        <!-- Harmful Effects -->
+        <div class="form-group">
+            <label for="harmful_effects">Harmful Effects (one per line)</label>
+            <textarea id="harmful_effects" name="harmful_effects">
+                {%- if pest.harmful_effects is iterable and pest.harmful_effects is not string -%}
+                    {{ pest.harmful_effects|join('\n') }}
+                {%- else -%}
+                    {{ pest.harmful_effects }}
+                {%- endif -%}
+            </textarea>
+        </div>
+        
+        <!-- Organic Solutions -->
+        <div class="form-group">
+            <label for="organic_solutions">Organic Solutions (one per line)</label>
+            <textarea id="organic_solutions" name="organic_solutions">
+                {%- if pest.organic_solutions is iterable and pest.organic_solutions is not string -%}
+                    {{ pest.organic_solutions|join('\n') }}
+                {%- else -%}
+                    {{ pest.organic_solutions }}
+                {%- endif -%}
+            </textarea>
+        </div>
+        
+        <!-- Chemical Pesticides -->
+        <div class="form-group">
+            <label for="chemical_pesticides">Chemical Pesticides (one per line)</label>
+            <textarea id="chemical_pesticides" name="chemical_pesticides">
+                {%- if pest.chemical_pesticides is iterable and pest.chemical_pesticides is not string -%}
+                    {{ pest.chemical_pesticides|join('\n') }}
+                {%- else -%}
+                    {{ pest.chemical_pesticides }}
+                {%- endif -%}
+            </textarea>
+        </div>
+        
+        <!-- Prevention Methods -->
+        <div class="form-group">
+            <label for="prevention_methods">Prevention Methods (one per line)</label>
+            <textarea id="prevention_methods" name="prevention_methods">
+                {%- if pest.prevention_methods is iterable and pest.prevention_methods is not string -%}
+                    {{ pest.prevention_methods|join('\n') }}
+                {%- else -%}
+                    {{ pest.prevention_methods }}
+                {%- endif -%}
+            </textarea>
+        </div>
+        
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">
+                <i class="fas fa-save"></i> Update Pest
+            </button>
+            <a href="{{ url_for('admin_add_pest') }}" class="cancel-btn">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Initialize form
+    document.addEventListener('DOMContentLoaded', function() {
+        // Image preview for new upload
+        const imageInput = document.getElementById('image');
+        const currentImage = document.getElementById('currentImage');
+        
+        imageInput.addEventListener('change', function(e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    currentImage.src = e.target.result;
+                }
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    });
+</script>
+{% endblock %}

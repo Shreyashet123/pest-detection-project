@@ -1,0 +1,1075 @@
+<!-- templates/user_dashboard.html -->
+{% extends 'layout.html' %}
+
+{% block head %}
+    {{ super() }}
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+{% endblock %}
+
+{% block body %}
+<style>
+    /* Dashboard Styles - FIXED FOR FULL WIDTH */
+    .dashboard-wrapper {
+        min-height: 100vh;
+        width: 100%;
+        padding: 0;
+        background: transparent !important;
+        color: white !important; /* ADDED: Default text color white */
+    }
+    
+    .dashboard-container {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 30px 5%;
+        background: transparent;
+        color: white !important; /* ADDED */
+    }
+    
+    /* Welcome section */
+    .welcome-section {
+        background: linear-gradient(135deg, #4CAF50, #2E7D32);
+        color: white;
+        padding: 40px;
+        border-radius: 15px;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        width: 100%;
+    }
+    
+    .welcome-section h1 {
+        margin: 0 0 15px 0;
+        font-size: 2.8rem;
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        color: white !important;
+    }
+    
+    .user-info {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: center;
+        color: white !important;
+    }
+    
+    .user-info a {
+        color: #FFEB3B !important;
+        text-decoration: none;
+        transition: opacity 0.3s;
+        padding: 5px 10px;
+        border-radius: 5px;
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .user-info a:hover {
+        opacity: 0.8;
+        background: rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Stats cards with hover effects - IMPROVED */
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+        width: 100%;
+    }
+    
+    .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 25px;
+        border-radius: 15px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        display: flex;
+        align-items: center;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        width: 100%;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        border-color: rgba(76, 175, 80, 0.5);
+        background: rgba(255, 255, 255, 0.15);
+    }
+    
+    /* Table styles */
+    .recent-uploads table {
+        background: rgba(255, 255, 255, 0.1);
+        width: 100%;
+        color: white !important;
+    }
+    
+    .recent-uploads th,
+    .recent-uploads td {
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: white !important;
+    }
+    
+    .recent-uploads th {
+        background: rgba(255, 255, 255, 0.15);
+        font-weight: 700;
+        color: white !important;
+        font-size: 1rem;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    /* Action cards - IMPROVED */
+    .action-card {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        margin-bottom: 20px;
+        padding: 30px;
+        transition: all 0.3s;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .action-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        border-color: rgba(76, 175, 80, 0.3);
+        background: rgba(255, 255, 255, 0.15) !important;
+    }
+    
+    /* Confidence bar */
+    .confidence-bar {
+        background: rgba(233, 236, 239, 0.2) !important;
+        height: 24px;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .confidence-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #4CAF50, #8BC34A);
+        border-radius: 12px;
+    }
+    
+    .confidence-text {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        line-height: 24px;
+        font-weight: 600;
+        color: white;
+        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        font-size: 0.85rem;
+    }
+    
+    /* Pest Carousel Styles - ENHANCED */
+   .pest-carousel-section {
+        margin-bottom: 50px;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 40px;
+        border-radius: 18px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        overflow: hidden; 
+        position: relative;
+        width: 100%;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+    }
+    
+    .carousel-title {
+        color: white !important; /* CHANGED from #2c3e50 to white */
+        margin-bottom: 30px;
+        font-size: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        font-weight: 700;
+    }
+    
+    .carousel-title i {
+        color: #4CAF50;
+        background: rgba(76, 175, 80, 0.2);
+        padding: 12px;
+        border-radius: 12px;
+    }
+    
+ .swiper {
+    width: 100%;
+    padding: 40px 0 60px;
+}
+.swiper-slide {
+    width: 320px !important;
+    height: 240px;
+    border-radius: 18px;
+    overflow: hidden;
+    background: #000;
+    position: relative;
+    transition: all 0.4s ease;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    flex-shrink: 0 !important;
+}
+
+    
+   .swiper-slide:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+ 
+ .swiper-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+    
+    .swiper-slide:hover img {
+        transform: scale(1.08);
+    }
+    
+ .pest-overlay {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.5px;
+}
+    
+
+.swiper-pagination-bullet {
+    background: #4CAF50;
+    opacity: 0.4;
+    width: 12px;
+    height: 12px;
+}
+.swiper-pagination-bullet-active {
+    opacity: 1;
+    transform: scale(1.2);
+}
+    
+    /* Empty state */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 15px;
+        margin: 30px 0;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        border: 2px dashed rgba(255, 255, 255, 0.2);
+        color: white !important;
+    }
+    
+    .empty-icon {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 25px;
+        font-size: 2.5rem;
+        color: #4CAF50;
+    }
+    
+    /* Query count highlight */
+    .query-highlight {
+        position: relative;
+    }
+    
+    .query-highlight::after {
+        content: '';
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 24px;
+        height: 24px;
+        background: linear-gradient(135deg, #ff4081, #f50057);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+        box-shadow: 0 0 15px rgba(255, 64, 129, 0.5);
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(0.9); opacity: 0.8; }
+        50% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0.8; }
+    }
+    
+    /* Quick Actions Section */
+    .quick-actions-section h2 {
+        color: white !important; /* CHANGED from #2c3e50 to white */
+        margin-bottom: 25px;
+        font-size: 1.8rem;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 700;
+    }
+    
+    .quick-actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+        gap: 25px;
+        width: 100%;
+    }
+    
+    /* Stat icon improvements */
+    .stat-icon {
+        width: 70px !important;
+        height: 70px !important;
+        background: linear-gradient(135deg, var(--icon-color), var(--icon-dark)) !important;
+        border-radius: 15px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin-right: 20px !important;
+        box-shadow: 0 6px 15px rgba(0,0,0,0.3) !important;
+    }
+    
+    .stat-icon i {
+        color: white !important;
+        font-size: 1.8rem !important;
+    }
+    
+    /* Section Headers */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+        gap: 20px;
+        width: 100%;
+        color: white !important;
+    }
+    
+    .section-header h2 {
+        margin: 0;
+        color: white !important; /* CHANGED from #2c3e50 to white */
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
+    
+    /* Button Styles */
+    .btn-primary {
+        background: linear-gradient(135deg, #4CAF50, #2E7D32) !important;
+        color: white !important;
+        padding: 12px 28px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(76, 175, 80, 0.5);
+        color: white !important;
+    }
+    
+    .btn-outline {
+        border: 2px solid #4CAF50;
+        color: white !important; /* CHANGED from #2E7D32 to white */
+        padding: 12px 28px;
+        border-radius: 10px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        background: rgba(76, 175, 80, 0.1);
+    }
+    
+    .btn-outline:hover {
+        background: #4CAF50;
+        color: white !important;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 15px rgba(46, 125, 50, 0.3);
+    }
+    
+    /* All text inside dashboard should be white */
+    .dashboard-container h1,
+    .dashboard-container h2,
+    .dashboard-container h3,
+    .dashboard-container h4,
+    .dashboard-container p,
+    .dashboard-container span,
+    .dashboard-container div,
+    .dashboard-container td,
+    .dashboard-container th,
+    .dashboard-container small {
+        color: white !important;
+    }
+    
+    /* Specific text color fixes */
+    .stat-card h3 {
+        color: white !important;
+        font-size: 2.5rem !important;
+    }
+    
+    .stat-card p {
+        color: rgba(255, 255, 255, 0.9) !important;
+        font-size: 1.1rem !important;
+    }
+    
+    .action-card h4 {
+        color: white !important;
+        font-size: 1.3rem !important;
+    }
+    
+    .action-card p {
+        color: rgba(255, 255, 255, 0.8) !important;
+        font-size: 1rem !important;
+    }
+    
+    /* Table text colors */
+    .recent-uploads strong {
+        color: white !important;
+    }
+    
+    .recent-uploads small {
+        color: rgba(255, 255, 255, 0.7) !important;
+    }
+    
+    /* Mobile card text colors */
+    .mobile-cards > div {
+        background: rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
+    }
+    
+    .mobile-cards > div div {
+        color: white !important;
+    }
+    
+    /* Responsive design */
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 20px 15px;
+        }
+        
+        .welcome-section {
+            padding: 25px 20px;
+            margin-bottom: 30px;
+        }
+        
+        .welcome-section h1 {
+            font-size: 2rem;
+        }
+        
+        .user-info {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .stats-cards {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .stat-card {
+            padding: 20px;
+        }
+        
+        .pest-carousel-section {
+            padding: 25px 20px;
+            margin-bottom: 30px;
+        }
+        
+        .carousel-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: white !important;
+        }
+        
+       .swiper-slide {
+            width: 85vw !important;
+            height: 220px;
+        }
+        
+        .quick-actions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .recent-uploads {
+            padding: 25px 20px !important;
+        }
+    }
+
+    /* ===== SWIPER LAYOUT FIX (MANDATORY) ===== */
+.swiper-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+}
+.swiper-slide {
+    flex-shrink: 0 !important;
+}
+/* ===== RESPONSIVE SWIPER IMAGE FIX ===== */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .swiper-slide {
+        width: 300px !important;
+        height: 240px;
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .swiper {
+        padding: 30px 0 50px;
+    }
+
+    .swiper-slide {
+        width: 85vw !important;
+        height: 220px;
+    }
+
+    .pest-overlay {
+        font-size: 1.1rem;
+        padding: 12px;
+    }
+}
+
+/* Small phones */
+@media (max-width: 480px) {
+    .swiper-slide {
+        height: 200px;
+    }
+
+    .carousel-title {
+        font-size: 1.4rem;
+        color: white !important;
+    }
+    
+    .welcome-section h1 {
+        font-size: 1.8rem;
+        color: white !important;
+    }
+}
+
+/* ===== RESPONSIVE TABLE FIXES ===== */
+
+/* Hide desktop table on mobile */
+@media (max-width: 768px) {
+    .desktop-table {
+        display: none !important;
+    }
+    
+    .mobile-cards {
+        display: block !important;
+    }
+    
+    .confidence-text-mobile {
+        display: inline !important;
+    }
+    
+    .confidence-text-desktop {
+        display: none !important;
+    }
+    
+    .action-text {
+        display: none !important;
+    }
+    
+    .recent-uploads .action-text + i {
+        margin-left: 0;
+    }
+}
+
+/* Show desktop table on larger screens */
+@media (min-width: 769px) {
+    .desktop-table {
+        display: table !important;
+    }
+    
+    .mobile-cards {
+        display: none !important;
+    }
+}
+
+/* Responsive adjustments for medium screens */
+@media (max-width: 1024px) {
+    .recent-uploads {
+        padding: 30px !important;
+    }
+    
+    .recent-uploads table th,
+    .recent-uploads table td {
+        padding: 14px 15px !important;
+        font-size: 0.95rem;
+    }
+}
+
+/* Small phone adjustments */
+@media (max-width: 480px) {
+    .recent-uploads {
+        padding: 20px !important;
+        margin: 20px 0 !important;
+    }
+    
+    .mobile-cards > div {
+        padding: 15px !important;
+    }
+    
+    .recent-uploads h2 {
+        font-size: 1.4rem !important;
+        color: white !important;
+    }
+}
+
+/* Better table scrolling on mobile */
+.recent-uploads > div {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Improve button responsiveness */
+.recent-uploads a {
+    transition: all 0.3s ease;
+    min-width: 120px;
+    text-align: center;
+    justify-content: center;
+}
+
+.recent-uploads a:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+/* Modern Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+/* Card Hover Effects */
+.stat-card, .action-card, .pest-carousel-section, .recent-uploads {
+    transition: box-shadow 0.3s ease;
+}
+
+.stat-card:hover, .action-card:hover {
+    box-shadow: 0 15px 35px rgba(0,0,0,0.3) !important;
+}
+
+/* Loading Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.dashboard-container > * {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Gradient Background for Stats */
+.stat-card:nth-child(1) .stat-icon {
+    --icon-color: #2196F3;
+    --icon-dark: #1976D2;
+}
+
+.stat-card:nth-child(2) .stat-icon {
+    --icon-color: #FF9800;
+    --icon-dark: #F57C00;
+}
+
+.stat-card:nth-child(3) .stat-icon {
+    --icon-color: #9C27B0;
+    --icon-dark: #7B1FA2;
+}
+
+/* Ensure all text in recent uploads is visible */
+.recent-uploads {
+    color: white !important;
+}
+
+.recent-uploads * {
+    color: white !important;
+}
+
+/* Empty state text colors */
+.empty-state p {
+    color: white !important;
+}
+
+.empty-state p:first-of-type {
+    color: white !important;
+    font-weight: 600;
+}
+
+.empty-state p:last-of-type {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+</style>
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-container">
+        <!-- Welcome Section -->
+        <div class="welcome-section">
+            <h1>👋 {{ lang.welcome }}, {{ username }}!</h1>
+            <div class="user-info">
+                <span>{{ lang.dashboard }}</span>
+                <span>{{ lang.language }}: {{ session.get('language', 'English') }}</span>
+            </div>
+        </div>
+        
+        <!-- Pest Carousel - FIXED VERSION -->
+<div class="pest-carousel-section">
+    <h2 class="carousel-title">
+        <i class="fa-solid fa-images"></i>
+        {{ lang.pest_gallery_title | default('Common Pests Gallery') }}
+    </h2>
+
+    <div class="swiper mySwiper">
+        <div class="swiper-wrapper">
+            {% set pests = [
+                ('alphids', 'Aphids'),
+                ('armyworm', 'Armyworm'),
+                ('bettle', 'Beetle'),
+                ('locust', 'Locust'),
+                ('Mealybugs', 'Mealybug'),
+                ('rice_borer', 'Rice Borer')
+            ] %}
+
+            {% for filename, label in pests %}
+            <div class="swiper-slide">
+                <img src="{{ url_for('static', filename='images/' ~ filename ~ '.jpg') }}"
+                     alt="{{ label }}"
+                     onerror="this.src='https://images.unsplash.com/photo-1598188306155-25e8ed8c6c8e?w=600&h=400&fit=crop'">
+                <div class="pest-overlay">🔍 {{ label }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="swiper-pagination"></div>
+    </div>
+</div>
+        <!-- Stats Cards -->
+        <div class="stats-cards">
+            {% set pests_detected = uploads|selectattr('pest_detected')|list|length %}
+            {% set query_count = query_count|default(0) %}
+            
+            <div class="stat-card" onclick="window.location='{{ url_for('predict_page') }}'">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-upload"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 2.5rem; color: white !important;">{{ uploads|length }}</h3>
+                    <p style="margin: 8px 0 0 0; color: rgba(255, 255, 255, 0.9) !important; font-size: 1.1rem;">{{ lang.total_uploads }}</p>
+                </div>
+            </div>
+            
+            <div class="stat-card" onclick="window.location='#recent-uploads'">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-bug"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 2.5rem; color: white !important;">{{ pests_detected }}</h3>
+                    <p style="margin: 8px 0 0 0; color: rgba(255, 255, 255, 0.9) !important; font-size: 1.1rem;">{{ lang.pests_detected }}</p>
+                </div>
+            </div>
+            
+            <div class="stat-card query-highlight" onclick="window.location='{{ url_for('my_queries') }}'">
+                <div class="stat-icon">
+                    <i class="fa-solid fa-question-circle"></i>
+                </div>
+                <div>
+                    <h3 style="margin: 0; font-size: 2.5rem; color: white !important;">{{ query_count }}</h3>
+                    <p style="margin: 8px 0 0 0; color: rgba(255, 255, 255, 0.9) !important; font-size: 1.1rem;">{{ lang.your_queries }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Quick Actions
+        <div class="quick-actions-section" style="margin-bottom: 40px;">
+            <div class="section-header">
+                <h2 style="color: white !important;">
+                    <i class="fa-solid fa-bolt" style="color: #FF9800;"></i> {{ lang.quick_actions }}
+                </h2>
+            </div>
+            <div class="quick-actions-grid">
+                {% for action in [
+                    {'icon': 'camera', 'title_key': 'upload_detect', 'desc_key': 'upload_desc', 'url': url_for('predict_page'), 'color': '#4CAF50'},
+                    {'icon': 'question-circle', 'title_key': 'my_queries', 'desc_key': 'ask_desc', 'url': url_for('my_queries'), 'color': '#9C27B0'},
+                    {'icon': 'leaf', 'title_key': 'crop_advisor', 'desc_key': 'crop_advisor_desc', 'url': url_for('crop_recommendation'), 'color': '#FF9800'},
+                    {'icon': 'sign-out-alt', 'title_key': 'sign_out', 'desc_key': 'signout_desc', 'url': url_for('logout'), 'color': '#F44336'}
+                ] %}
+                <a href="{{ action.url }}" style="text-decoration: none;">
+                    <div class="action-card" style="border-left: 4px solid {{ action.color }};">
+                        <div style="width: 60px; height: 60px; background: {{ action.color }}25; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                            <i class="fa-solid fa-{{ action.icon }}" style="color: {{ action.color }}; font-size: 1.8rem;"></i>
+                        </div>
+                        <h4 style="margin: 0 0 15px 0; color: white !important; font-size: 1.3rem;">{{ lang[action.title_key] }}</h4>
+                        <p style="margin: 0; color: rgba(255, 255, 255, 0.8) !important; font-size: 1rem; line-height: 1.5;">{{ lang[action.desc_key] }}</p>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div> -->
+        
+        <!-- Recent Uploads Section -->
+        <div class="recent-uploads" id="recent-uploads">
+            <div class="section-header">
+                <h2 style="color: white !important;"><i class="fa-solid fa-history"></i> {{ lang.recent_detections }}</h2>
+                <div style="display: flex; gap: 15px;">
+                    <a href="{{ url_for('history_page') }}" class="btn-outline" style="color: white !important;">
+                        <i class="fa-solid fa-list-ul"></i> {{ lang.view_all | default('View All') }}
+                    </a>
+                    <a href="{{ url_for('predict_page') }}" class="btn-primary" style="color: white !important;">
+                        <i class="fa-solid fa-plus"></i> {{ lang.upload_more }}
+                    </a>
+                </div>
+            </div>
+
+            {% if uploads %}
+            <div style="overflow-x: auto;">
+                <!-- Desktop Table -->
+                <table class="desktop-table">
+                    <thead>
+                        <tr>
+                            <th style="color: white !important;">{{ lang.timeline }}</th>
+                            <th style="color: white !important;">{{ lang.detection_result }}</th>
+                            <th style="text-align: center; color: white !important;">{{ lang.actions }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for upload in uploads[:5] %}
+                        <tr>
+                            <td style="min-width: 130px;">
+                                <div style="font-weight: 700; font-size: 1rem; color: white !important;">{{ upload.uploaded_at.strftime('%d %b %Y') }}</div>
+                                <small style="color: rgba(255, 255, 255, 0.7) !important; font-size: 0.9rem;">{{ upload.uploaded_at.strftime('%I:%M %p') }}</small>
+                            </td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+                                    <img src="{{ upload.cloudinary_url }}" 
+                                         style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px; border: 2px solid rgba(255, 255, 255, 0.2);"
+                                         onerror="this.src='https://images.unsplash.com/photo-1544860505-44d4c68b36f6?w=150&h=150&fit=crop'">
+                                    <div style="min-width: 180px;">
+                                        <strong style="font-size: 1.1rem; display: block; margin-bottom: 5px; color: white !important;">
+                                            {{ upload.pest_detected or 'No Pest' }}
+                                        </strong>
+                                        <div style="font-size: 0.95rem; color: #4CAF50 !important; font-weight: 600;">
+                                            <span class="confidence-text-desktop">{{ upload.confidence }}% Confidence</span>
+                                            <span class="confidence-text-mobile" style="display: none;">{{ upload.confidence }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="text-align: center; min-width: 120px;">
+                                <a href="{{ url_for('result_with_language', upload_id=upload._id|string, lang=session.get('language', 'english')) }}" 
+                                   class="btn-outline" style="padding: 8px 16px; font-size: 0.9rem; color: white !important;">
+                                   <i class="fa-solid fa-eye"></i> <span class="action-text">{{ lang.details }}</span>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Mobile Cards (Hidden on Desktop) -->
+                <div class="mobile-cards" style="display: none;">
+                    {% for upload in uploads[:5] %}
+                    <div style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 20px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.1) !important; box-shadow: 0 4px 12px rgba(0,0,0,0.2); color: white !important;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                            <div>
+                                <div style="font-weight: 700; font-size: 1.1rem; color: white !important;">
+                                    {{ upload.uploaded_at.strftime('%d %b %Y') }}
+                                </div>
+                                <small style="color: rgba(255, 255, 255, 0.7) !important; font-size: 0.9rem;">
+                                    {{ upload.uploaded_at.strftime('%I:%M %p') }}
+                                </small>
+                            </div>
+                            <div style="background: linear-gradient(135deg, #4CAF50, #2E7D32); color: white !important; padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: 700;">
+                                {{ upload.confidence }}%
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px;">
+                            <img src="{{ upload.cloudinary_url }}" 
+                                 style="width: 70px; height: 70px; object-fit: cover; border-radius: 10px; border: 2px solid rgba(255, 255, 255, 0.2);"
+                                 onerror="this.src='https://images.unsplash.com/photo-1544860505-44d4c68b36f6?w=150&h=150&fit=crop'">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 800; font-size: 1.2rem; color: white !important; margin-bottom: 5px;">
+                                    {{ upload.pest_detected or 'No Pest' }}
+                                </div>
+                                <div style="font-size: 0.95rem; color: rgba(255, 255, 255, 0.8) !important;">
+                                    Pest Detection
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center;">
+                            <a href="{{ url_for('result_with_language', upload_id=upload._id|string, lang=session.get('language', 'english')) }}" 
+                               class="btn-primary" style="display: block; padding: 12px; font-size: 1rem; color: white !important;">
+                               <i class="fa-solid fa-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                {% if uploads|length > 5 %}
+                <div style="text-align: center; padding-top: 30px;">
+                    <a href="{{ url_for('history_page') }}" 
+                       class="btn-outline" style="padding: 12px 30px; font-size: 1rem; color: white !important;">
+                        {{ lang.view_complete_history }} ({{ uploads|length }} Total) 
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fa-solid fa-image"></i>
+                </div>
+                <p style="font-size: 1.3rem; margin-bottom: 15px; color: white !important; font-weight: 600;">No detections yet</p>
+                <p style="margin-bottom: 25px; color: rgba(255, 255, 255, 0.8) !important; font-size: 1.1rem;">Upload your first image to start detecting pests!</p>
+                <a href="{{ url_for('predict_page') }}" class="btn-primary" style="padding: 15px 35px; font-size: 1.1rem; color: white !important;">
+                    <i class="fa-solid fa-camera"></i> Upload Image
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Swiper JS -->
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Swiper with FIXED configuration
+   const swiper = new Swiper('.mySwiper', {
+    slidesPerView: 1,
+    spaceBetween: 20,
+
+    loop: true,
+    grabCursor: true,
+
+    autoplay: {
+        delay: 1500,              // speed between slides
+        disableOnInteraction: false,
+        reverseDirection: false,  // 👉 RIGHT → LEFT movement
+    },
+
+    speed: 600,                  // slide animation speed
+
+    effect: 'slide',
+
+    pagination: {
+        el: ".swiper-pagination",
+        clickable: true,
+    },
+
+    // IMPORTANT: turn off centering
+    centeredSlides: false,
+    centeredSlidesBounds: false,
+
+    breakpoints: {
+        320: { slidesPerView: 1, spaceBetween: 10 },
+        640: { slidesPerView: 2, spaceBetween: 20 },
+        1024:{ slidesPerView: 3, spaceBetween: 30 },
+        1400:{ slidesPerView: 4, spaceBetween: 40 }
+    },
+
+    observer: true,
+    observeParents: true,
+    watchOverflow: true,
+});
+    // Fix initial positioning issue
+    setTimeout(() => {
+        swiper.update();
+        swiper.slideTo(0);
+    }, 100);
+
+    // Highlight query count if there are queries
+    const queryCount = {{ query_count|default(0) }};
+    if (queryCount > 0) {
+        const queryCard = document.querySelector('.query-highlight');
+        if (queryCard) {
+            queryCard.style.boxShadow = '0 0 25px rgba(156, 39, 176, 0.4)';
+        }
+    }
+});
+
+// Delete and Notification Functions
+function confirmDelete(uploadId) {
+    if (confirm('{{ lang.confirm_delete | default("Are you sure?") }}')) {
+        deleteUpload(uploadId);
+    }
+}
+
+async function deleteUpload(uploadId) {
+    try {
+        const response = await fetch(`/delete_upload/${uploadId}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await response.json();
+        if (data.success) {
+            showNotification('✅ Upload deleted!', 'success');
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showNotification(`❌ Error: ${data.error}`, 'error');
+        }
+    } catch (error) {
+        showNotification('❌ Network error.', 'error');
+    }
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed; top: 20px; right: 20px; padding: 15px 25px;
+        border-radius: 10px; color: white; font-weight: 600; z-index: 9999;
+        background: ${type === 'success' ? '#4CAF50' : '#F44336'};
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    `;
+    notification.textContent = message;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 3000);
+}
+</script>
+{% endblock %}

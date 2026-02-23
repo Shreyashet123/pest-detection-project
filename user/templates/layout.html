@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{{ title if title else "Pest Detection" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style1.css') }}">
+    <!-- Add Chart.js for crop recommendation charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .banner {
+            width: 100%;
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), url('{{ url_for("static", filename="images/pest.jpg") }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding-bottom: 50px;
+        }
+     body.home-page .banner {
+    height: 100vh;
+    min-height: 100vh;
+    overflow: hidden;
+    padding-bottom: 0;
+}
+
+
+        .navbar {
+            width: 85%;
+            margin: auto;
+            padding: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .logo { width: 120px; cursor: pointer; }
+
+        .navbar ul {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar ul li {
+            position: relative;
+            margin: 0 10px;
+        }
+
+        .navbar ul li a {
+            text-decoration: none;
+            color: #fff;
+            text-transform: uppercase;
+            font-weight: 600;
+            font-size: 14px;
+            transition: 0.3s;
+            display: inline-block;
+            padding: 5px 0;
+            white-space: nowrap;
+        }
+
+        .navbar ul li a.active, .navbar ul li a:hover { 
+            color: #4CAF50; 
+            border-bottom: 2px solid #4CAF50;
+        }
+        
+        /* Fix for links not working */
+        a {
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: none;
+        }
+
+        /* FIXED: Smaller Footer Styles - Only show on non-home pages */
+        footer {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 30px 0 15px;
+            margin-top: auto;
+            width: 100%;
+        }
+
+        .footer-container {
+            width: 85%;
+            margin: 0 auto;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+
+        .footer-section {
+            flex: 1;
+            min-width: 250px;
+            margin-bottom: 20px;
+            padding: 0 15px;
+        }
+
+        .footer-section h3 {
+            color: #4CAF50;
+            margin-bottom: 15px;
+            font-size: 18px;
+            position: relative;
+            padding-bottom: 8px;
+        }
+
+        .footer-section h3:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 40px;
+            height: 2px;
+            background: #4CAF50;
+        }
+
+        .footer-section p {
+            line-height: 1.6;
+            margin-bottom: 12px;
+            color: #bbb;
+            font-size: 14px;
+        }
+
+        .footer-section .contact-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .footer-section .contact-info i {
+            color: #4CAF50;
+            margin-right: 12px;
+            font-size: 16px;
+            width: 20px;
+        }
+
+        .footer-section .social-links {
+            display: flex;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .footer-section .social-links a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: #333;
+            border-radius: 50%;
+            color: #fff;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .footer-section .social-links a:hover {
+            background: #4CAF50;
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 15px;
+            margin-top: 20px;
+            border-top: 1px solid #333;
+            color: #bbb;
+            font-size: 13px;
+        }
+
+        .footer-bottom a {
+            color: #4CAF50;
+        }
+
+        @media (max-width: 768px) {
+            .footer-container {
+                flex-direction: column;
+            }
+            
+            .footer-section {
+                padding: 0;
+                margin-bottom: 25px;
+            }
+            
+            .footer-section:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+.hero-center {
+    min-height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 50px;
+    text-align: center;
+    width: 100%;
+}
+
+.hero-center h1 {
+    font-size: 48px;
+    color: white;
+    margin-bottom: 25px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+}
+
+.hero-center p {
+    font-size: 22px;
+    color: #f0f0f0;
+    max-width: 800px;
+    margin-bottom: 40px;
+    line-height: 1.6;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.hero-buttons button {
+    padding: 15px 32px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    border: none;
+    background: #4CAF50;
+    color: white;
+    transition: 0.3s;
+}
+
+.hero-buttons button.outline {
+    background: transparent;
+    border: 2px solid #4CAF50;
+}
+
+.hero-buttons button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+body {
+    display: block;
+}
+
+/* ===== GLOBAL RESPONSIVE SAFETY ===== */
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+ul {
+    padding-left: 0;
+}
+
+.banner {
+    background-attachment: scroll; /* prevents mobile lag */
+}
+
+/* ===== NAVBAR RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .navbar {
+        width: 95%;
+        flex-wrap: wrap;
+    }
+
+    .navbar ul {
+        width: 100%;
+        margin-top: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .navbar ul li {
+        margin: 5px 10px;
+    }
+    
+    .navbar ul li a {
+        font-size: 15px;
+    }
+}
+
+/* ===== HERO RESPONSIVE ===== */
+@media (max-width: 992px) {
+    .hero-center h1 {
+        font-size: 38px;
+    }
+
+    .hero-center p {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 600px) {
+    .hero-center {
+        padding-top: 40px;
+    }
+
+    .hero-center h1 {
+        font-size: 30px;
+    }
+
+    .hero-center p {
+        font-size: 17px;
+        padding: 0 10px;
+    }
+
+    .hero-buttons {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .hero-buttons button {
+        width: 100%;
+        max-width: 280px;
+    }
+}
+
+/* ===== CONTENT RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .banner > div[style*="width: 85%"] {
+        width: 95% !important;
+    }
+}
+
+/* ===== FOOTER RESPONSIVE ===== */
+@media (max-width: 600px) {
+    footer {
+        padding: 25px 0 10px;
+    }
+
+    .footer-section h3 {
+        font-size: 16px;
+    }
+
+    .footer-section p {
+        font-size: 13px;
+    }
+
+    .footer-bottom {
+        font-size: 12px;
+    }
+}
+
+/* =========================
+   MOBILE HAMBURGER NAVBAR
+   ========================= */
+.menu-toggle {
+    display: none;
+    font-size: 26px;
+    color: white;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+/* Mobile behavior */
+@media (max-width: 900px) {
+    .menu-toggle {
+        display: block;
+        order: 2;
+    }
+
+    .navbar {
+        flex-wrap: wrap;
+    }
+
+    .navbar ul {
+        width: 100%;
+        display: none;
+        flex-direction: column;
+        background: rgba(0,0,0,0.95);
+        border-radius: 8px;
+        margin-top: 15px;
+        padding: 10px 0;
+        order: 3;
+    }
+
+    .navbar ul.show {
+        display: flex;
+    }
+
+    .navbar ul li {
+        margin: 10px 0;
+        text-align: center;
+        width: 100%;
+    }
+
+    .navbar ul li a {
+        font-size: 16px;
+        padding: 10px 0;
+        display: block;
+        width: 100%;
+    }
+}
+
+/* ===== FLASH MESSAGES RESPONSIVE ===== */
+@media (max-width: 768px) {
+    #flash-container {
+        width: 95% !important;
+        margin: 15px auto !important;
+    }
+    
+    .flash-message {
+        padding: 12px !important;
+        font-size: 14px !important;
+    }
+}
+ .login-page-nav {
+        width: 85%;
+        margin: auto;
+        padding: 20px 0;
+    }
+    
+    .back-to-home {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        padding: 8px 16px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+    }
+    
+    .back-to-home:hover {
+        background: rgba(76, 175, 80, 0.2);
+        transform: translateX(-5px);
+    }
+    
+    .back-to-home i {
+        font-size: 14px;
+    }
+    </style>
+</head>
+<body class="{% if request.endpoint == 'home' %}home-page{% endif %}">
+   <div class="banner">
+    <!-- NAVBAR SECTION - CHANGED -->
+    {% if request.endpoint not in ['login', 'register', 'auth_page'] %}
+    <div class="navbar">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo"> 
+        <i class="fas fa-bars menu-toggle"></i>
+        <ul>
+            <li>
+                <a class="{{ 'active' if request.endpoint == 'home' }}"
+                   href="{{ url_for('home') }}">
+                   Home
+                </a>
+            </li>
+            
+            {% if session.get('role') == 'user' %}
+                <li><a href="{{ url_for('user_dashboard') }}">Dashboard</a></li>
+                <li><a href="{{ url_for('predict_page') }}">Pest Detection</a></li>
+                <li><a href="{{ url_for('crop_recommendation') }}">Crop Advisor</a></li>
+                <li><a href="{{ url_for('my_queries') }}">My Queries</a></li>
+                <li><a href="{{ url_for('about_us') }}">About Us</a></li>
+                <li><a href="{{ url_for('pest_library') }}">Pest Library</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                
+            {% elif session.get('role') == 'admin' %}
+                <li><a class="{{ 'active' if request.endpoint == 'admin_dashboard' }}" href="{{ url_for('admin_dashboard') }}">Admin Panel</a></li>
+                <li><a class="{{ 'active' if request.endpoint == 'admin_queries' }}" href="{{ url_for('admin_queries') }}">Queries</a></li>
+                <!-- ADD PEST LIBRARY LINK FOR ADMIN -->
+                <li><a href="{{ url_for('pest_library') }}">Pest Library</a></li>
+                <li>
+                    <a href="{{ url_for('logout') }}" style="color: #ff4d4d;">
+                        Logout
+                    </a>
+                </li>
+
+            {% else %}
+                <!-- ADD PEST LIBRARY LINK HERE FOR GUESTS -->
+                <li><a href="{{ url_for('pest_library') }}">Pest Library</a></li>
+                
+                <!-- Login/Get Started Link for Guests -->
+                <li><a class="{{ 'active' if request.endpoint in ['login', 'register', 'auth_page'] }}" 
+                       href="{{ url_for('login') }}">
+                    <i class="fas fa-sign-in-alt"></i> Get Started
+                </a></li>
+            {% endif %}
+        </ul>
+    </div>
+    
+    {% else %}
+    <!-- SHOW ONLY BACK BUTTON ON LOGIN/REGISTER PAGES -->
+    <div class="login-page-nav">
+        <a href="{{ url_for('home') }}" class="back-to-home">
+            <i class="fas fa-arrow-left"></i>
+            Back to Home
+        </a>
+    </div>
+    {% endif %}
+
+    <!-- FLASH MESSAGES CONTAINER -->
+    <div id="flash-container" style="width: 85%; margin: 20px auto;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash-message" style="padding: 15px; margin-bottom: 10px; border-radius: 5px; 
+                        {% if category == 'success' %}
+                            background: #d4edda; color: #155724; border: 1px solid #c3e6cb;
+                        {% elif category == 'danger' %}
+                            background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;
+                        {% elif category == 'warning' %}
+                            background: #fff3cd; color: #856404; border: 1px solid #ffeeba;
+                        {% else %}
+                            background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb;
+                        {% endif %}">
+                        <i class="fas 
+                            {% if category == 'success' %}fa-check-circle
+                            {% elif category == 'danger' %}fa-exclamation-circle
+                            {% elif category == 'warning' %}fa-exclamation-triangle
+                            {% else %}fa-info-circle{% endif %}"
+                            style="margin-right: 10px;">
+                        </i>
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- CONTENT AREA -->
+    <div style="width: 85%; margin: 0 auto; padding: 0;">
+        {% block body %} {% endblock %}
+    </div>
+</div>
+    
+    <!-- Login Prompt Modal -->
+    <div id="loginPromptModal" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 10000; max-width: 400px;">
+        <div style="background: linear-gradient(135deg, #2c3e50, #4CAF50); color: white; padding: 20px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
+                <h4 style="margin: 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-lock" style="color: #4CAF50;"></i>
+                    <span id="loginPromptTitle">Login Required</span>
+                </h4>
+                <button onclick="closeLoginPrompt()" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <p id="loginPromptMessage" style="margin-bottom: 20px; font-size: 14px; line-height: 1.5;">
+                Please login to access additional pest information and features.
+            </p>
+            
+            <div style="display: flex; gap: 10px;">
+                <button onclick="redirectToLogin()" style="flex: 1; padding: 10px 15px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s;">
+                    <i class="fas fa-sign-in-alt"></i> Login Now
+                </button>
+                <button onclick="closeLoginPrompt()" style="padding: 10px 15px; background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 5px; cursor: pointer; transition: 0.3s;">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- FIXED: Footer only shows on non-home pages -->
+    {% if request.endpoint not in ['home', 'login'] %}
+    <footer>
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Contact Us</h3>
+                <div class="contact-info">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <p>123 Agriculture Street, Farming District</p>
+                </div>
+                <div class="contact-info">
+                    <i class="fas fa-phone"></i>
+                    <p>+1 (555) 123-4567</p>
+                </div>
+                <div class="contact-info">
+                    <i class="fas fa-envelope"></i>
+                    <p>support@pestdetection.com</p>
+                </div>
+                <div class="social-links">
+                    <a href="https://github.com" target="_blank" title="GitHub">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="https://linkedin.com" target="_blank" title="LinkedIn">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                    <a href="https://twitter.com" target="_blank" title="Twitter">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="https://facebook.com" target="_blank" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+               <p>
+  <a href="{{ url_for('home') }}" style="color: #bbb;">
+    Home
+  </a>
+</p>
+                <p><a href="{{ url_for('about_us') }}" style="color: #bbb;">About Us</a></p>
+                
+                <!-- ADD PEST LIBRARY LINK IN FOOTER -->
+                <p><a href="{{ url_for('pest_library') }}" style="color: #bbb;">Pest Library</a></p>
+                
+                <p><a href="{{ url_for('predict_page') if session.get('role') == 'user' else '#' }}" style="color: #bbb;">Pest Detection</a></p>
+                <p><a href="{{ url_for('crop_recommendation') if session.get('role') == 'user' else '#' }}" style="color: #bbb;">Crop Advisor</a></p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>About Pest Detection</h3>
+                <p>AI-powered pest detection and crop recommendation services to help farmers protect crops and maximize yield.</p>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>© 2024 Pest Detection System. All rights reserved.</p>
+        </div>
+    </footer>
+    {% endif %}
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ===== HAMBURGER MENU TOGGLE =====
+            const menuToggle = document.querySelector('.menu-toggle');
+            const navMenu = document.querySelector('.navbar ul');
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', function () {
+                    navMenu.classList.toggle('show');
+                });
+            }
+            
+            // ===== AUTO-HIDE FLASH MESSAGES =====
+            const flashMessages = document.querySelectorAll('.flash-message');
+            flashMessages.forEach(function(message) {
+                setTimeout(function() {
+                    message.style.transition = 'opacity 0.5s ease';
+                    message.style.opacity = '0';
+                    setTimeout(function() {
+                        if (message.parentNode) {
+                            message.parentNode.removeChild(message);
+                        }
+                    }, 500);
+                }, 5000);
+            });
+            
+            // ===== LOGIN PROMPT FUNCTIONS =====
+            window.showLoginPrompt = function(message = null) {
+                const modal = document.getElementById('loginPromptModal');
+                const title = document.getElementById('loginPromptTitle');
+                const messageEl = document.getElementById('loginPromptMessage');
+                
+                if (message) {
+                    messageEl.textContent = message;
+                }
+                
+                modal.style.display = 'block';
+                
+                // Auto-hide after 10 seconds
+                setTimeout(() => {
+                    if (modal.style.display === 'block') {
+                        closeLoginPrompt();
+                    }
+                }, 10000);
+            };
+            
+            window.closeLoginPrompt = function() {
+                const modal = document.getElementById('loginPromptModal');
+                modal.style.display = 'none';
+            };
+            
+            window.redirectToLogin = function() {
+                closeLoginPrompt();
+                window.location.href = "{{ url_for('login') }}";
+            };
+            
+            window.showPestLoginPrompt = function(pestName = null) {
+                let message = 'Please login to view complete information about this pest.';
+                
+                if (pestName) {
+                    message = `Please login to view complete information about "${pestName}".`;
+                }
+                
+                showLoginPrompt(message);
+            };
+            
+            // Check if we should show login prompt based on URL parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('login_required') === 'true') {
+                const message = urlParams.get('message');
+                showLoginPrompt(message);
+            }
+        });
+    </script>
+</body>
+</html>
