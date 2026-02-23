@@ -1,101 +1,122 @@
-# Pest Classification and Detection System using Deep Learning
+# Pest Detection System using Deep Learning 🐛🌾
 
-Pests significantly affect agricultural yields, leading to declines in productivity and nutrient depletion. Excessive pesticide usage often results in increased pesticide residues, disrupting the food chain and causing adverse effects on human health and the environment. Our deep learning-based solution automates pest detection and classification to address these challenges.
+An intelligent web-based system that automatically detects and classifies crop pests using deep learning, helping farmers and agricultural professionals identify pests and get recommended solutions.
 
-## Key Features
+---
 
-✅ **Automated Pest Detection** - Advanced deep learning model for accurate pest identification  
-⚡ **Efficient Processing** - Rapid image analysis outperforming manual inspection  
-🎯 **High Accuracy** - State-of-the-art classification performance  
-🌐 **Scalable Solution** - Ready for large-scale agricultural deployment  
-🖥️ **User-Friendly Interface** - Accessible to non-technical users  
-📚 **Comprehensive Pest Database** - Detailed information including descriptions and treatment recommendations  
+## 🎯 Problem Statement
 
-## System Screenshots
+Pests significantly affect agricultural yields, leading to declines in productivity and nutrient depletion. Excessive pesticide usage often results in increased pesticide residues, disrupting the food chain and causing adverse effects on human health and the environment. Manual pest identification is time-consuming, error-prone, and requires expert knowledge.
 
-### Prediction Interface
-![Prediction Page](https://github.com/NikhilAMathew/Pest-Classification-and-Detection-System-using-Deep-Learning/assets/117088447/a76d6075-cf97-43d8-887b-d98ddc40794c)
+---
 
-### Results Display
-![Result Page](https://github.com/NikhilAMathew/Pest-Classification-and-Detection-System-using-Deep-Learning/assets/117088447/415febc8-9588-4e37-8d57-b134fda46f10)
+## 💡 Solution
 
-### Administrative Dashboard
-![Officer Dashboard](https://github.com/NikhilAMathew/Pest-Classification-and-Detection-System-using-Deep-Learning/assets/117088447/65110c1b-e7b2-4326-a61a-2eb19c8695fd)
+Our deep learning-based solution automates pest detection and classification to address these challenges.  
+Users can upload images of pests, and the system will identify the pest type and provide comprehensive information including:
 
-## Technical Implementation
+- Organic solutions  
+- Chemical treatments  
+- Prevention methods  
 
-- **Deep Learning Model**: Custom-trained CNN for pest classification
-- **Backend**: Python with Flask framework
-- **Database**: MongoDB for pest information storage
-- **Frontend**: Responsive web interface
+---
 
-## Installation Guide
+## 🌟 Key Features
 
-### Prerequisites
-- Python 3.8+
-- MongoDB
-- pip package manager
+### 👤 For Users
+- Pest detection using AI from uploaded images  
+- Multi-language support (English, Hindi, Bengali)  
+- Pest library with detailed information  
+- Query system to ask agricultural experts  
+- History tracking of past detections and queries  
+- Weather-based pest prediction (temperature, humidity, location)
 
-### Setup Instructions
+### 🛡️ For Admins
+- Dashboard with real-time analytics  
+- Pest management (add, edit, delete pests)  
+- User management  
+- Query response system  
+- Analytics charts for pest trends and system usage  
 
-1. **Download Required Files**:
-   - [Download model and dataset](https://drive.google.com/drive/folders/1Fb1J3y-kVtWnOmW-K21Bb-bIz6wlffdL?usp=sharing)
+---
 
-2. **Prepare Model Files**:
+## 🔬 Pest Classes Detected
+
+The model can identify **11 pest categories**:
+
+1. Armyworms Group  
+2. Corn Worms Group  
+3. Small Sap-Sucking Pests  
+4. Africanized Honey Bees (Killer Bees)  
+5. Brown Marmorated Stink Bugs  
+6. Cabbage Loopers  
+7. Citrus Canker  
+8. Colorado Potato Beetles  
+9. Fruit Flies  
+10. Tomato Hornworms  
+11. Western Corn Rootworms  
+
+---
+
+## 🛠️ Technology Stack
+
+### ⚙️ Backend
+- Flask (Python)  
+- MongoDB (PyMongo)  
+- Authentication: Email/Password & Google OAuth  
+- Cloudinary (image storage)
+
+### 🧠 Machine Learning
+- Custom CNN using TensorFlow/Keras  
+- Image processing: Pillow, NumPy  
+- Model size: ~25MB (deployment optimized)
+
+### 🎨 Frontend
+- Jinja2 HTML templates  
+- Custom responsive CSS  
+- Chart.js for analytics visualization
+
+### 🔌 APIs & Integrations
+- Google Gemini AI (recommendations & prediction)  
+- Google OAuth (login)  
+- Cloudinary (image upload)
+
+---
+
+## 👥 User Roles
+
+### 👤 Regular Users
+- Register/Login (Email or Google)  
+- Upload pest images  
+- View pest information  
+- Ask questions  
+- View detection history  
+- Access pest library  
+- Get crop recommendations
+
+### 🛡️ Administrators
+- Admin dashboard access  
+- Pest database management  
+- Query response  
+- Analytics view  
+- User management  
+- Upload monitoring  
+
+---
+
+## 🚀 Installation Guide
+
+### ✅ Prerequisites
+- Python 3.8+  
+- MongoDB (local or Atlas)  
+- pip  
+- Git  
+
+---
+
+### 📥 Setup Instructions
+
+1. **Clone the repository**
    ```bash
-   mkdir models
-   mv pest_model.pth models/
-   ```
-
-3. **Database Setup**:
-   ```bash
-   # Create MongoDB database and collection
-   mongo
-   > use pest
-   > db.createCollection("pest_details")
-   # Import JSON data (use the downloaded file)
-   ```
-
-4. **Install Dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-5. **Run the Application**:
-   ```bash
-   python main.py
-   ```
-
-6. **Access the System**:
-   Open your browser and navigate to `http://localhost:5000`
-
-## System Architecture
-
-```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│                 │    │                 │    │                 │
-│   Frontend UI   │ ←→ │  Flask Server   │ ←→ │     MongoDB     │
-│                 │    │                 │    │                 │
-└─────────────────┘    └─────────────────┘    └─────────────────┘
-                               ↑
-                               │
-                      ┌─────────────────┐
-                      │                 │
-                      │  Deep Learning  │
-                      │     Model       │
-                      │                 │
-                      └─────────────────┘
-```
-
-## Contributing
-
-We welcome contributions! Please fork the repository and submit pull requests for any enhancements.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-For questions or support, please contact on [gmail](mathewnikhil@gmail.com)
-
+   git clone https://github.com/Shreyashet123/pest-detection-project.git
+   cd pest-detection-project
