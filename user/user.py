@@ -18,7 +18,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # NOW import local modules
-from utils.cloudinary_config import configure_cloudinary, upload_to_cloudinary, delete_from_cloudinary
+from user.utils.cloudinary_config import configure_cloudinary, upload_to_cloudinary, delete_from_cloudinary
 import google.generativeai as genai
 from languages import LANGUAGES
 from ml_model.predictor import predict_pest
