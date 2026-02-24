@@ -17,12 +17,13 @@ torch==2.1.1
 torchvision==0.16.1
 tornado==6.3.3
 tqdm==4.66.1
-google-auth>=2.23.0
-google-auth-oauthlib>=1.1.0
-google-auth-httplib2>=0.1.1
-requests>=2.31.0
 gunicorn==21.2.0
 python-dotenv==1.0.0
 cloudinary==1.36.0
 google-generativeai==0.3.0
+
+# TensorFlow and its dependencies - with correct auth versions
 tensorflow-cpu==2.13.0
+google-auth==2.23.0
+google-auth-oauthlib==1.0.0
+google-auth-httplib2==0.1.1
