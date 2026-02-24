@@ -205,7 +205,7 @@
                     {% if current_lang == 'english' %}Detected
                     {% elif current_lang == 'bangla' %}সনাক্তকৃত
                     {% elif current_lang == 'hindi' %}पता चला
-                    {% else %}Detected{% endif %}: {{ predicted_class }}
+                    {% else %}Detected{% endif %}: {{ pest.name }}
                 </p>
             </div>
         </div>
@@ -421,7 +421,7 @@
                                         {% elif current_lang == 'hindi' %}पता चला कीट
                                         {% else %}Detected Pest{% endif %}
                                     </h5>
-                                    <p class="mb-0"><strong>{{ predicted_class }}</strong></p>
+                                    <p class="mb-0"><strong>{{ pest.name }}</strong></p>
                                 </div>
                             </div>
                             <div class="col-md-4">
