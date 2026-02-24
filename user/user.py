@@ -12,14 +12,15 @@ import time
 from datetime import datetime, timedelta
 from bson.objectid import ObjectId
 from werkzeug.utils import secure_filename
-from utils.cloudinary_config import configure_cloudinary, upload_to_cloudinary, delete_from_cloudinary
-import google.generativeai as genai
-from languages import LANGUAGES
-# Add these two lines to fix the import issue
+
+# Add these two lines FIRST before any local imports
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Now this will work
+# NOW import local modules
+from utils.cloudinary_config import configure_cloudinary, upload_to_cloudinary, delete_from_cloudinary
+import google.generativeai as genai
+from languages import LANGUAGES
 from ml_model.predictor import predict_pest
 import io
 
