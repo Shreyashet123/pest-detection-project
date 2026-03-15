@@ -1,28 +1,33 @@
-# --- WEB & SERVER ---
+# --- CORE WEB ---
 Flask==3.1.2
 flask-cors==6.0.1
-flask-pymongo==3.0.1
+Flask-PyMongo==3.0.1
 Flask-Login==0.6.3
 Flask-WTF==1.2.2
 gunicorn==23.0.0
-python-dotenv==1.0.0
-python-multipart==0.0.6
-bcrypt==4.0.1
+python-dotenv==1.2.1
+python-multipart==0.0.21
+bcrypt==5.0.0
 
-# --- DATABASE & CLOUD ---
-pymongo==4.5.0
-cloudinary==1.36.0
+# --- DATABASE & STORAGE ---
+pymongo==4.15.5
+cloudinary==1.44.1
 
-# --- GOOGLE AUTHENTICATION (Login Essentials) ---
-google-auth==2.23.4
-google-auth-oauthlib==1.1.0
-requests-oauthlib==1.3.1
-requests==2.31.0
+# --- GOOGLE AUTHENTICATION ---
+# Leave these unpinned so they can find versions compatible with TF
+google-auth
+google-auth-oauthlib
+requests-oauthlib
+requests==2.32.5
 
-# --- PEST DETECTION ML (Memory Optimized) ---
-tensorflow-cpu==2.13.0
+# --- PEST DETECTION (Memory Optimized) ---
+# Critical: Use -cpu version to stay under 512MB RAM
+tensorflow-cpu==2.15.0
 opencv-python-headless==4.8.1.78
-pillow==10.0.0
+pillow==12.0.0
+# Keep numpy below 2.0 to avoid breaking TensorFlow 2.x
+numpy>=1.23.5,<2.0.0
+h5py==3.10.0
 
-# --- EXTRA AI ---
-google-generativeai==0.3.2
+# --- AI APIs ---
+google-generativeai==0.8.5
