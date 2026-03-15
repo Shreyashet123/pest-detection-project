@@ -457,7 +457,13 @@ ul {
     <!-- NAVBAR SECTION - CHANGED -->
     {% if request.endpoint not in ['login', 'register', 'auth_page'] %}
     <div class="navbar">
-        <img src="{{ url_for('static', filename='images/logo.png') }}" class="logo"> 
+        <div class="site-name" style="display: flex; align-items: center;">
+    <div style="background: #4CAF50; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+        <i class="fas fa-shield-alt" style="color: white; font-size: 20px;"></i>
+    </div>
+    <span style="color: white; font-size: 24px; font-weight: 700;">Crop</span>
+    <span style="color: #4CAF50; font-size: 24px; font-weight: 700;">Care</span>
+</div>
         <i class="fas fa-bars menu-toggle"></i>
         <ul>
             <li>
