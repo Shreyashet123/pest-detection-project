@@ -1,56 +1,28 @@
-# Core ML - Use CPU version to save memory
-tensorflow-cpu==2.13.0
-
-# Image processing - Use older opencv that works with numpy 1.x
-opencv-python-headless==4.8.1.78
-pillow==10.0.0
-numpy==1.24.3  # This works with both
-
-# Web framework
+# --- WEB & SERVER ---
 Flask==3.1.2
 flask-cors==6.0.1
 flask-pymongo==3.0.1
 Flask-Login==0.6.3
 Flask-WTF==1.2.2
 gunicorn==23.0.0
-Werkzeug==3.1.4
-Jinja2==3.1.6
-click==8.3.1
-itsdangerous==2.2.0
-MarkupSafe==3.0.3
-blinker==1.9.0
-greenlet==3.2.4
-
-# Database
-pymongo==4.5.0
-
-# Authentication & OAuth
-requests==2.31.0
-oauthlib==3.2.2
-requests-oauthlib==1.3.1
-google-auth==2.23.4
-google-auth-oauthlib==1.1.0
-bcrypt==4.0.1
-
-# Environment & utilities
 python-dotenv==1.0.0
 python-multipart==0.0.6
+bcrypt==4.0.1
 
-# Cloud storage
+# --- DATABASE & CLOUD ---
+pymongo==4.5.0
 cloudinary==1.36.0
 
-# AI APIs
-google-generativeai==0.3.2
+# --- GOOGLE AUTHENTICATION (Login Essentials) ---
+google-auth==2.23.4
+google-auth-oauthlib==1.1.0
+requests-oauthlib==1.3.1
+requests==2.31.0
 
-# Required dependencies (minimal)
-certifi==2023.11.17
-charset-normalizer==3.3.2
-idna==3.6
-urllib3==2.1.0
-pyasn1==0.5.1
-pyasn1_modules==0.3.0
-rsa==4.9
-six==1.16.0
-typing_extensions==4.8.0
-tzdata==2023.3
-protobuf==4.25.3
+# --- PEST DETECTION ML (Memory Optimized) ---
+tensorflow-cpu==2.13.0
+opencv-python-headless==4.8.1.78
+pillow==10.0.0
+
+# --- EXTRA AI ---
+google-generativeai==0.3.2
