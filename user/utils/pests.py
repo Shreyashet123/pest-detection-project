@@ -6,6 +6,8 @@ def map_pest_name(pest_name):
     """
     Map different pest name formats to the standard names in pest_group_data
     """
+    print(f"🔍 [map_pest_name] INPUT: '{pest_name}'")
+    
     # Common variations mapping
     variations_map = {
         # Armyworms variations
@@ -58,21 +60,29 @@ def map_pest_name(pest_name):
     
     # First check exact match
     if pest_name in pest_group_data:
+        print(f"✅ [map_pest_name] Exact match found: '{pest_name}'")
         return pest_name
     
     # Check case-insensitive match
     for key in pest_group_data.keys():
         if pest_name.lower() == key.lower():
+            print(f"✅ [map_pest_name] Case-insensitive match: '{pest_name}' -> '{key}'")
             return key
     
     # Check variations map
     if pest_name in variations_map:
-        return variations_map[pest_name]
+        mapped = variations_map[pest_name]
+        print(f"✅ [map_pest_name] Variations map match: '{pest_name}' -> '{mapped}'")
+        return mapped
     
     # Check partial matches
     for key in pest_group_data.keys():
         if pest_name.lower() in key.lower() or key.lower() in pest_name.lower():
+            print(f"✅ [map_pest_name] Partial match: '{pest_name}' -> '{key}'")
             return key
+    
+    print(f"❌ [map_pest_name] NO MATCH found for '{pest_name}'")
+    print(f"📋 Available keys: {list(pest_group_data.keys())}")
     
     # Return original if no match found
     return pest_name
