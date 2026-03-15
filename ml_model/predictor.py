@@ -11,7 +11,7 @@ MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 
 print("🔄 Loading Pest Detection Model...")
 MODEL_PATH = os.path.join(MODEL_DIR, 'pest_grouped_model_v1.h5')
-model = tf.keras.models.load_model(MODEL_PATH)
+model = tf.keras.models.load_model(MODEL_PATH, compile=False)
 
 # Load class mapping
 MAPPING_PATH = os.path.join(MODEL_DIR, 'class_mapping.json')
