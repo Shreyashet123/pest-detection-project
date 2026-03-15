@@ -4059,5 +4059,4 @@ if __name__ == '__main__':
     print("   ➕ Add Pest: http://localhost:5000/admin/add-pest")
     print("   📚 Pest Library: http://localhost:5000/pest-library")
     print("=" * 60)
-    port = int(os.environ.get("PORT", 5000))  # Use Render's port or default to 5000
-    app.run(host='0.0.0.0', port=port, debug=True)
+    app.run(debug=True, port=5000)

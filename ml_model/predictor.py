@@ -1,22 +1,17 @@
+# ml_model/predictor.py
 import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
 import json
 import os
-import gc  # ADD THIS - for garbage collection
 
 # Get the directory of this file
 MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 
 print("🔄 Loading Pest Detection Model...")
 MODEL_PATH = os.path.join(MODEL_DIR, 'pest_grouped_model_v1.h5')
-
-# CHANGE THIS LINE (add compile=False)
-model = tf.keras.models.load_model(MODEL_PATH, compile=False)  # ← ADD compile=False
-
-# ADD THIS LINE right after loading model
-tf.keras.backend.clear_session()  # ← ADD THIS - clears memory
+model = tf.keras.models.load_model(MODEL_PATH)
 
 # Load class mapping
 MAPPING_PATH = os.path.join(MODEL_DIR, 'class_mapping.json')
@@ -36,15 +31,10 @@ def predict_pest(image_bytes):
     Returns: dict with predicted_class, confidence, all_predictions
     """
     try:
-        # ADD THIS - garbage collection before prediction
-        gc.collect()  # ← ADD THIS
-        
         # Open and preprocess image
         img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         img = img.resize((IMG_SIZE, IMG_SIZE))
-        
-        # CHANGE THIS LINE (use float32)
-        img_array = np.array(img, dtype=np.float32) / 255.0  # ← ADD dtype=np.float32
+        img_array = np.array(img) / 255.0
         img_batch = np.expand_dims(img_array, axis=0)
         
         # Make prediction
@@ -55,17 +45,10 @@ def predict_pest(image_bytes):
         predicted_class = class_names[top_idx]
         confidence = float(predictions[top_idx]) * 100
         
-        # CHANGE THIS - only return top 5 predictions
+        # Get all predictions
         all_predictions = {}
-        # Get indices of top 5 predictions
-        top_indices = np.argsort(predictions)[-5:][::-1]  # ← ADD THIS
-        for idx in top_indices:  # ← CHANGE THIS
-            all_predictions[class_names[idx]] = round(float(predictions[idx]) * 100, 2)
-        
-        # ADD THESE LINES - clean up
-        del img_array  # ← ADD THIS
-        del img_batch  # ← ADD THIS
-        gc.collect()   # ← ADD THIS
+        for i, class_name in enumerate(class_names):
+            all_predictions[class_name] = round(float(predictions[i]) * 100, 2)
         
         print(f"✅ Predicted: {predicted_class} ({confidence:.1f}%)")
         
@@ -73,7 +56,7 @@ def predict_pest(image_bytes):
             "success": True,
             "predicted_class": predicted_class,
             "confidence": round(confidence, 2),
-            "all_predictions": all_predictions  # Now only top 5
+            "all_predictions": all_predictions
         }
         
     except Exception as e:

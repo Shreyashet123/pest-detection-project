@@ -6,8 +6,6 @@ def map_pest_name(pest_name):
     """
     Map different pest name formats to the standard names in pest_group_data
     """
-    print(f"🔍 [map_pest_name] INPUT: '{pest_name}'")
-    
     # Common variations mapping
     variations_map = {
         # Armyworms variations
@@ -60,34 +58,49 @@ def map_pest_name(pest_name):
     
     # First check exact match
     if pest_name in pest_group_data:
-        print(f"✅ [map_pest_name] Exact match found: '{pest_name}'")
         return pest_name
     
     # Check case-insensitive match
     for key in pest_group_data.keys():
         if pest_name.lower() == key.lower():
-            print(f"✅ [map_pest_name] Case-insensitive match: '{pest_name}' -> '{key}'")
             return key
     
     # Check variations map
     if pest_name in variations_map:
-        mapped = variations_map[pest_name]
-        print(f"✅ [map_pest_name] Variations map match: '{pest_name}' -> '{mapped}'")
-        return mapped
+        return variations_map[pest_name]
     
     # Check partial matches
     for key in pest_group_data.keys():
         if pest_name.lower() in key.lower() or key.lower() in pest_name.lower():
-            print(f"✅ [map_pest_name] Partial match: '{pest_name}' -> '{key}'")
             return key
-    
-    print(f"❌ [map_pest_name] NO MATCH found for '{pest_name}'")
-    print(f"📋 Available keys: {list(pest_group_data.keys())}")
     
     # Return original if no match found
     return pest_name
 
 def get_pest_details(pest_name, language='english'):
+    # 1. Clean the input name (AI results often have trailing spaces)
+    pest_name = pest_name.strip()
+    language = language.lower()
+
+    # 2. Check if pest exists in our data
+    if pest_name in pest_group_data:
+        pest_data = pest_group_data[pest_name]
+        
+        # 3. Check if language exists, otherwise default to English
+        if language in pest_data:
+            return pest_data[language]
+        else:
+            return pest_data.get('english')
+
+    # 4. Fallback if the AI predicted something not in your dictionary
+    return {
+        'name': pest_name,
+        'description': f'No detailed information found for "{pest_name}". Please check the class mapping.',
+        'harmful_effects': ['Data unavailable'],
+        'organic_solutions': ['Consult local extension office'],
+        'chemical_pesticides': ['N/A'],
+        'prevention_methods': ['Regular monitoring']
+    }
     """
     Get pest details in specified language
     Args:
@@ -96,11 +109,7 @@ def get_pest_details(pest_name, language='english'):
     Returns:
         Dictionary with pest details or default if not found
     """
-    # Clean inputs
-    pest_name = pest_name.strip()
-    language = language.lower()
-    
-    # Map the pest name to standard format (USES YOUR MAPPING FUNCTION!)
+    # Map the pest name to standard format
     mapped_name = map_pest_name(pest_name)
     print(f"DEBUG [pest.py]: Mapping '{pest_name}' -> '{mapped_name}'")
     
@@ -114,13 +123,13 @@ def get_pest_details(pest_name, language='english'):
         'prevention_methods': ['Regular monitoring']
     }
     
-    # Check if pest exists in database
+    # Check if pest exists
     if mapped_name in pest_group_data:
         pest_data = pest_group_data[mapped_name]
         
-        # Return requested language if available, otherwise English
-        if language in pest_data:
-            return pest_data[language]
+        # Check if language exists, fall back to english
+        if language.lower() in pest_data:
+            return pest_data[language.lower()]
         elif 'english' in pest_data:
             return pest_data['english']
         else:
@@ -130,6 +139,7 @@ def get_pest_details(pest_name, language='english'):
     
     print(f"DEBUG [pest.py]: No data found for '{mapped_name}'")
     return default_data
+
 # ... rest of your pest_group_data remains the same ...
 
 def get_all_pests_list():
