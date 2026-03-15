@@ -78,29 +78,6 @@ def map_pest_name(pest_name):
     return pest_name
 
 def get_pest_details(pest_name, language='english'):
-    # 1. Clean the input name (AI results often have trailing spaces)
-    pest_name = pest_name.strip()
-    language = language.lower()
-
-    # 2. Check if pest exists in our data
-    if pest_name in pest_group_data:
-        pest_data = pest_group_data[pest_name]
-        
-        # 3. Check if language exists, otherwise default to English
-        if language in pest_data:
-            return pest_data[language]
-        else:
-            return pest_data.get('english')
-
-    # 4. Fallback if the AI predicted something not in your dictionary
-    return {
-        'name': pest_name,
-        'description': f'No detailed information found for "{pest_name}". Please check the class mapping.',
-        'harmful_effects': ['Data unavailable'],
-        'organic_solutions': ['Consult local extension office'],
-        'chemical_pesticides': ['N/A'],
-        'prevention_methods': ['Regular monitoring']
-    }
     """
     Get pest details in specified language
     Args:
@@ -109,7 +86,11 @@ def get_pest_details(pest_name, language='english'):
     Returns:
         Dictionary with pest details or default if not found
     """
-    # Map the pest name to standard format
+    # Clean inputs
+    pest_name = pest_name.strip()
+    language = language.lower()
+    
+    # Map the pest name to standard format (USES YOUR MAPPING FUNCTION!)
     mapped_name = map_pest_name(pest_name)
     print(f"DEBUG [pest.py]: Mapping '{pest_name}' -> '{mapped_name}'")
     
@@ -123,13 +104,13 @@ def get_pest_details(pest_name, language='english'):
         'prevention_methods': ['Regular monitoring']
     }
     
-    # Check if pest exists
+    # Check if pest exists in database
     if mapped_name in pest_group_data:
         pest_data = pest_group_data[mapped_name]
         
-        # Check if language exists, fall back to english
-        if language.lower() in pest_data:
-            return pest_data[language.lower()]
+        # Return requested language if available, otherwise English
+        if language in pest_data:
+            return pest_data[language]
         elif 'english' in pest_data:
             return pest_data['english']
         else:
@@ -139,7 +120,6 @@ def get_pest_details(pest_name, language='english'):
     
     print(f"DEBUG [pest.py]: No data found for '{mapped_name}'")
     return default_data
-
 # ... rest of your pest_group_data remains the same ...
 
 def get_all_pests_list():
