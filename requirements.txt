@@ -1,22 +1,26 @@
-# --- GOOGLE & WEB LIBRARIES ---
-google-generativeai==0.8.5
-google-auth-oauthlib==1.2.3
-google-api-python-client==2.187.0
-google-auth==2.41.1
+# --- Web & Database Framework ---
 Flask==3.1.2
 Flask-Login==0.6.3
 Flask-PyMongo==3.0.1
 Flask-SQLAlchemy==3.1.1
 gunicorn==23.0.0
-cloudinary==1.44.1
 python-dotenv==1.2.1
 requests==2.32.5
 
-# --- FIXED ML SECTION (Versions must match) ---
+# --- Google & AI Services ---
+google-generativeai==0.8.5
+google-auth-oauthlib==1.2.3
+google-api-python-client==2.187.0
+google-auth==2.41.1
+
+# --- ML Framework (CPU-only for Render RAM limits) ---
+# These 3 versions are strictly matched to prevent conflicts:
 tensorflow-cpu==2.15.0
 keras>=2.15.0,<2.16.0
-numpy==1.26.4
+numpy>=1.23.5,<1.27.0
 
-# --- IMAGE PROCESSING ---
+# --- Image Processing & Utilities ---
+# Downgraded OpenCV to 4.9.0 to be compatible with NumPy 1.x
+opencv-python-headless==4.9.0.80
 pillow==12.0.0
-opencv-python-headless==4.12.0.88
+cloudinary==1.44.1
