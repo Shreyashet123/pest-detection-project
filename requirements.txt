@@ -12,15 +12,10 @@ cloudinary==1.44.1
 python-dotenv==1.2.1
 requests==2.32.5
 
-# --- OPTIMIZE THESE TO STOP THE CRASHES ---
-# Use the CPU-only version of TensorFlow to save ~500MB of RAM
+# --- FIXED ML SECTION ---
 tensorflow-cpu==2.15.0
-keras==3.13.0
+keras<2.16
 numpy==1.26.4
-
-# Remove torch and torchvision if your pest model only uses Keras/TF. 
-# If you absolutely need them, use the cpu versions:
-# torch --index-url https://download.pytorch.org/whl/cpu
 
 # --- IMAGE PROCESSING ---
 pillow==12.0.0
