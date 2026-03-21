@@ -6,6 +6,7 @@ import re
 from functools import wraps
 from flask import Flask, request, render_template, redirect, url_for, flash, session, jsonify, make_response
 from flask_pymongo import PyMongo
+from flask_cors import CORS  
 from dotenv import load_dotenv
 import os
 import time
@@ -28,6 +29,7 @@ import io
 load_dotenv()
 
 app = Flask(__name__)
+CORS(app)
 app.config.update(
     SECRET_KEY=os.getenv('SECRET_KEY', 'strong-pest-detection-secret-key-2024!@#$%^&*()'),
     SESSION_PERMANENT=True,
