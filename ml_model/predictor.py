@@ -1,33 +1,17 @@
+# ml_model/predictor.py
 import tensorflow as tf
 import numpy as np
 from PIL import Image
 import io
 import json
 import os
-import h5py  # Added for the compatibility patch
 
 # Get the directory of this file
 MODEL_DIR = os.path.dirname(os.path.abspath(__file__))
 
 print("🔄 Loading Pest Detection Model...")
 MODEL_PATH = os.path.join(MODEL_DIR, 'pest_grouped_model_v1.h5')
-
-# --- MANDATORY COMPATIBILITY PATCH START ---
-try:
-    model = tf.keras.models.load_model(MODEL_PATH)
-except TypeError as e:
-    if "batch_shape" in str(e):
-        print("⚠️ Keras 3 model detected on Keras 2 environment. Patching metadata...")
-        with h5py.File(MODEL_PATH, 'r') as f:
-            model_config = f.attrs.get('model_config')
-            if model_config is None:
-                raise ImportError("Could not find model configuration in the H5 file.")
-            config_str = model_config.decode('utf-8').replace('"batch_shape"', '"batch_input_shape"')
-            model = tf.keras.models.model_from_json(config_str)
-            model.load_weights(MODEL_PATH)
-    else:
-        raise e
-# --- MANDATORY COMPATIBILITY PATCH END ---
+model = tf.keras.models.load_model(MODEL_PATH)
 
 # Load class mapping
 MAPPING_PATH = os.path.join(MODEL_DIR, 'class_mapping.json')
@@ -82,6 +66,7 @@ def predict_pest(image_bytes):
             "error": str(e)
         }
 
+# Test function
 if __name__ == "__main__":
     print("=" * 50)
     print("Model loaded successfully!")
